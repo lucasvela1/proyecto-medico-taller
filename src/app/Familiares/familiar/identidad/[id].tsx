@@ -1,6 +1,6 @@
-import { familiares } from "@/app/data/familiares";
-import { useState } from "react";
+import { ContactoEmergencia, familiares } from "@/app/data/familiares";
 import { useLocalSearchParams } from "expo-router";
+import { useState } from "react";
 import {
   Alert,
   FlatList,
@@ -13,26 +13,24 @@ import {
   View,
 } from "react-native";
 
-type ContactoEmergencia = {
-  id: string;
-  nombreApellido: string;
-  relacion: string;
-  numeroTel: string;
-  direccion: string;
-};
-
 export default function IdentidadScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const familiar = familiares.find((item) => item.id === id);
 
   const [nombre, setNombre] = useState(familiar?.nombre ?? "");
   const [apellido, setApellido] = useState(familiar?.apellido ?? "");
-  const [dni, setDni] = useState("");
-  const [fechaNacimiento, setFechaNacimiento] = useState("");
+  const [dni, setDni] = useState(familiar?.identidad?.dni ?? "");
+  const [fechaNacimiento, setFechaNacimiento] = useState(
+    familiar?.identidad?.fechaNacimiento ?? "",
+  );
 
-  const [contactos, setContactos] = useState<ContactoEmergencia[]>([]);
+  const [contactos, setContactos] = useState<ContactoEmergencia[]>(
+    familiar?.identidad?.contactosEmergencia ?? [],
+  );
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [editingContactoId, setEditingContactoId] = useState<string | null>(null);
+  const [editingContactoId, setEditingContactoId] = useState<string | null>(
+    null,
+  );
 
   const [nuevoNombreApellido, setNuevoNombreApellido] = useState("");
   const [nuevaRelacion, setNuevaRelacion] = useState("");
@@ -48,7 +46,8 @@ export default function IdentidadScreen() {
   };
 
   const guardarCambios = () => {
-    Alert.alert("Guardado", "Los datos fueron guardados correctamente.");
+    Alert.alert("Guardado", "Los datos fueron guardados correctamente."); //Aca faltaria conectar con el backend para guardar los cambios,
+    // pero como no hay dejo solo la alerta de que se guardo todo bien. Tambien se puede guardar internamente
   };
 
   const abrirNuevoContacto = () => {
@@ -84,7 +83,9 @@ export default function IdentidadScreen() {
         return [...prev, contactoPayload];
       }
 
-      return prev.map((item) => (item.id === editingContactoId ? contactoPayload : item));
+      return prev.map((item) =>
+        item.id === editingContactoId ? contactoPayload : item,
+      );
     });
 
     resetContactoForm();
@@ -100,8 +101,16 @@ export default function IdentidadScreen() {
           <Text style={styles.notFoundText}>Familiar no encontrado</Text>
         ) : (
           <>
-            <InputField label="Nombre" value={nombre} onChangeText={setNombre} />
-            <InputField label="Apellido" value={apellido} onChangeText={setApellido} />
+            <InputField
+              label="Nombre"
+              value={nombre}
+              onChangeText={setNombre}
+            />
+            <InputField
+              label="Apellido"
+              value={apellido}
+              onChangeText={setApellido}
+            />
             <InputField
               label="DNI"
               value={dni}
@@ -119,7 +128,10 @@ export default function IdentidadScreen() {
               <Text style={styles.sectionTitle}>Contactos de emergencia</Text>
               <Pressable
                 onPress={abrirNuevoContacto}
-                style={({ pressed }) => [styles.addButton, pressed && styles.buttonPressed]}
+                style={({ pressed }) => [
+                  styles.addButton,
+                  pressed && styles.buttonPressed,
+                ]}
               >
                 <Text style={styles.addButtonText}>+ Agregar</Text>
               </Pressable>
@@ -137,10 +149,17 @@ export default function IdentidadScreen() {
                 renderItem={({ item }) => (
                   <Pressable
                     onPress={() => abrirEdicionContacto(item)}
-                    style={({ pressed }) => [styles.contactCard, pressed && styles.buttonPressed]}
+                    style={({ pressed }) => [
+                      styles.contactCard,
+                      pressed && styles.buttonPressed,
+                    ]}
                   >
-                    <Text style={styles.contactName}>{item.nombreApellido}</Text>
-                    <Text style={styles.contactDetail}>Relacion: {item.relacion}</Text>
+                    <Text style={styles.contactName}>
+                      {item.nombreApellido}
+                    </Text>
+                    <Text style={styles.contactDetail}>
+                      Relacion: {item.relacion}
+                    </Text>
                     <Text style={styles.contactDetail}>
                       Numero tel: {item.numeroTel || "No informado"}
                     </Text>
@@ -154,7 +173,10 @@ export default function IdentidadScreen() {
 
             <Pressable
               onPress={guardarCambios}
-              style={({ pressed }) => [styles.saveButton, pressed && styles.buttonPressed]}
+              style={({ pressed }) => [
+                styles.saveButton,
+                pressed && styles.buttonPressed,
+              ]}
             >
               <Text style={styles.saveButtonText}>Guardar</Text>
             </Pressable>
@@ -171,11 +193,13 @@ export default function IdentidadScreen() {
         <View style={styles.modalOverlay}>
           <View style={styles.modalCard}>
             <Text style={styles.modalTitle}>
-              {editingContactoId ? "Editar contacto de emergencia" : "Nuevo contacto de emergencia"}
+              {editingContactoId
+                ? "Editar contacto de emergencia"
+                : "Nuevo contacto de emergencia"}
             </Text>
 
             <InputField
-              label="Nombre y apellido"
+              label="Nombre y apellido" //Si no dice KeyboardType, el teclado es el normal
               value={nuevoNombreApellido}
               onChangeText={setNuevoNombreApellido}
               compact
@@ -191,7 +215,7 @@ export default function IdentidadScreen() {
               value={nuevoNumeroTel}
               onChangeText={setNuevoNumeroTel}
               placeholder="Opcional"
-              keyboardType="phone-pad"
+              keyboardType="phone-pad" //El tipo de teclado es el del celu
               compact
             />
             <InputField
@@ -208,14 +232,20 @@ export default function IdentidadScreen() {
                   setIsModalVisible(false);
                   resetContactoForm();
                 }}
-                style={({ pressed }) => [styles.modalCancelButton, pressed && styles.buttonPressed]}
+                style={({ pressed }) => [
+                  styles.modalCancelButton,
+                  pressed && styles.buttonPressed,
+                ]}
               >
                 <Text style={styles.modalCancelText}>Cancelar</Text>
               </Pressable>
 
               <Pressable
                 onPress={guardarContacto}
-                style={({ pressed }) => [styles.modalConfirmButton, pressed && styles.buttonPressed]}
+                style={({ pressed }) => [
+                  styles.modalConfirmButton,
+                  pressed && styles.buttonPressed,
+                ]}
               >
                 <Text style={styles.modalConfirmText}>Guardar</Text>
               </Pressable>

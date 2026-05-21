@@ -1,17 +1,24 @@
-import { Familiar, familiares } from "@/app/data/familiares";
+import { familiares } from "@/app/data/familiares";
 import {
   adicionalesRoute,
   datosClinicosRoute,
   identidadRoute,
 } from "@/navigation/routes";
+import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { useEffect, useState } from "react";
+import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 
 export default function FamiliarDetalleScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
+  const [imageError, setImageError] = useState(false);
 
   const familiar = familiares.find((item) => item.id === id);
+
+  useEffect(() => {
+    setImageError(false);
+  }, [familiar?.imagenUrl]);
 
   if (!familiar) {
     return (
@@ -23,34 +30,72 @@ export default function FamiliarDetalleScreen() {
 
   return (
     <View style={styles.screen}>
-      <Text style={styles.title}>
-        {familiar.nombre} {familiar.apellido}
-      </Text>
+      <View style={styles.headerRow}>
+        <Pressable
+          onPress={() => {
+            // Lo dejo sin hacer nada para cuando se explique en clase como manejar la camara y almacenamiento interno
+          }}
+          style={({ pressed }) => [
+            styles.avatarPressable,
+            pressed && styles.avatarPressed,
+          ]}
+        >
+          {!familiar.imagenUrl || imageError ? (
+            <View style={styles.avatarFallback}>
+              <Ionicons name="person" size={30} color="#EAF4FF" />
+            </View>
+          ) : (
+            <Image
+              source={familiar.imagenUrl}
+              style={styles.avatarImage}
+              onError={() => setImageError(true)}
+            />
+          )}
+        </Pressable>
+
+        <Text style={styles.title}>
+          {familiar.nombre} {familiar.apellido}
+        </Text>
+      </View>
 
       <View style={styles.menuContainer}>
         <Pressable
           onPress={() => router.push(identidadRoute(familiar.id))}
-          style={({ pressed }) => [styles.menuButton, pressed && styles.menuButtonPressed]}
+          style={({ pressed }) => [
+            styles.menuButton,
+            pressed && styles.menuButtonPressed,
+          ]}
         >
           <Text style={styles.menuText}>Identidad y contacto</Text>
         </Pressable>
 
         <Pressable
           onPress={() => router.push(datosClinicosRoute(familiar.id))}
-          style={({ pressed }) => [styles.menuButton, pressed && styles.menuButtonPressed]}
+          style={({ pressed }) => [
+            styles.menuButton,
+            pressed && styles.menuButtonPressed,
+          ]}
         >
           <Text style={styles.menuText}>Datos clinicos importantes</Text>
         </Pressable>
 
         <Pressable
           onPress={() => router.push(adicionalesRoute(familiar.id))}
-          style={({ pressed }) => [styles.menuButton, pressed && styles.menuButtonPressed]}
+          style={({ pressed }) => [
+            styles.menuButton,
+            pressed && styles.menuButtonPressed,
+          ]}
         >
           <Text style={styles.menuText}>Adicionales</Text>
         </Pressable>
       </View>
 
-      <Pressable style={({ pressed }) => [styles.alertButton, pressed && styles.alertButtonPressed]}>
+      <Pressable
+        style={({ pressed }) => [
+          styles.alertButton,
+          pressed && styles.alertButtonPressed,
+        ]}
+      >
         <Text style={styles.alertText}>Alerta familiar</Text>
       </Pressable>
     </View>
@@ -64,7 +109,38 @@ const styles = StyleSheet.create({
     padding: 16,
     paddingTop: 28,
   },
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 14,
+  },
+  avatarPressable: {
+    borderRadius: 34,
+  },
+  avatarPressed: {
+    opacity: 0.9,
+    transform: [{ scale: 0.97 }],
+  },
+  avatarImage: {
+    width: 68,
+    height: 68,
+    borderRadius: 34,
+    borderWidth: 1,
+    borderColor: "#6E9DD7",
+    backgroundColor: "#24528A",
+  },
+  avatarFallback: {
+    width: 68,
+    height: 68,
+    borderRadius: 34,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "#6E9DD7",
+    backgroundColor: "#24528A",
+  },
   title: {
+    flexShrink: 1,
     fontSize: 30,
     fontWeight: "800",
     color: "#F4FAFF",

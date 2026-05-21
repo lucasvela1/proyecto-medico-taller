@@ -1,9 +1,17 @@
-import { Ionicons } from "@expo/vector-icons";
 import { Familiar, familiares } from "@/app/data/familiares";
 import { fichaShowRoute } from "@/navigation/routes";
+import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { FlatList, Image, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  FlatList,
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 
 export default function FamiliaresScreen() {
   const router = useRouter();
@@ -11,7 +19,8 @@ export default function FamiliaresScreen() {
 
   const filtro = texto.trim().toLowerCase();
   const familiaresFiltrados = familiares.filter((familiar) => {
-    const nombreCompleto = `${familiar.nombre} ${familiar.apellido}`.toLowerCase();
+    const nombreCompleto =
+      `${familiar.nombre} ${familiar.apellido}`.toLowerCase();
     return nombreCompleto.includes(filtro);
   });
 
@@ -27,7 +36,10 @@ export default function FamiliaresScreen() {
               onPress={() => {
                 // Placeholder for future navigation to create familiar screen.
               }}
-              style={({ pressed }) => [styles.addCard, pressed && styles.addCardPressed]}
+              style={({ pressed }) => [
+                styles.addCard,
+                pressed && styles.addCardPressed,
+              ]}
             >
               <Text style={styles.addSign}>+</Text>
               <Text style={styles.addText}>Agregar familiar</Text>
@@ -60,7 +72,13 @@ export default function FamiliaresScreen() {
   );
 }
 
-function FamiliarCard({ item, onPress }: { item: Familiar; onPress: () => void }) {
+function FamiliarCard({
+  item,
+  onPress,
+}: {
+  item: Familiar;
+  onPress: () => void;
+}) {
   const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
