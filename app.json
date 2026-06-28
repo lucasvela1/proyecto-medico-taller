@@ -23,8 +23,16 @@
       "predictiveBackGestureEnabled": false,
       "permissions": [
         "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
         "ACCESS_FINE_LOCATION"
-      ]
+      ],
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyAGoowL67JkTtIgo4XFgLkoYrVIHn4oX8M"
+        }
+      },
+      "package": "com.kotor1997.proyectomedico"
     },
     "web": {
       "output": "static",
@@ -46,6 +54,13 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "63821f09-85bb-4edf-b440-d81c720cbbf4"
+      }
+    },
+    "owner": "kotor"
   }
 }
