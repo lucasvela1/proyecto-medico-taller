@@ -8,7 +8,13 @@
     "scheme": "proyectomedico",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "icon": "./assets/expo.icon",
+      "config": {
+        "googleMapsApiKey": "AIzaSyAGoowL67JkTtIgo4XFgLkoYrVIHn4oX8M"
+      },
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Necesitamos acceso a tu ubicación para poder mostrarte las clínicas y farmacias cercanas."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -17,7 +23,16 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyAGoowL67JkTtIgo4XFgLkoYrVIHn4oX8M"
+        }
+      },
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION"
+      ]
     },
     "web": {
       "output": "static",
