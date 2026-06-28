@@ -21,38 +21,74 @@ type Lugar = {
 const GOOGLE_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_API_KEY || "";
 
 async function buscarLugaresCercanos(lat: number, lon: number): Promise<Lugar[]> {
-  const radio = 5000; // 5 km (5000 metros)
-  const urlClinicas = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lon}&radius=${radio}&type=hospital&key=${GOOGLE_API_KEY}`;
-  const urlFarmacias = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lon}&radius=${radio}&type=pharmacy&key=${GOOGLE_API_KEY}`;
+  const url = "https://places.googleapis.com/v1/places:searchNearby";
+  const headers = {
+    "Content-Type": "application/json",
+    "X-Goog-Api-Key": GOOGLE_API_KEY,
+    "X-Goog-FieldMask": "places.id,places.displayName,places.location",
+  };
+
+  const bodyClinicas = {
+    includedTypes: ["hospital", "medical_clinic", "medical_center"],
+    maxResultCount: 20,
+    locationRestriction: {
+      circle: {
+        center: { latitude: lat, longitude: lon },
+        radius: 5000.0,
+      },
+    },
+  };
+
+  const bodyFarmacias = {
+    includedTypes: ["pharmacy", "drugstore"],
+    maxResultCount: 20,
+    locationRestriction: {
+      circle: {
+        center: { latitude: lat, longitude: lon },
+        radius: 5000.0,
+      },
+    },
+  };
 
   const [resClinicas, resFarmacias] = await Promise.all([
-    fetch(urlClinicas),
-    fetch(urlFarmacias),
+    fetch(url, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(bodyClinicas),
+    }),
+    fetch(url, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(bodyFarmacias),
+    }),
   ]);
 
   const dataClinicas = await resClinicas.json();
   const dataFarmacias = await resFarmacias.json();
 
-  if (dataClinicas.status === "REQUEST_DENIED" || dataFarmacias.status === "REQUEST_DENIED") {
-    const errorMsg = dataClinicas.error_message || dataFarmacias.error_message || "Acceso Denegado";
+  if (!resClinicas.ok || !resFarmacias.ok) {
+    const errorMsg =
+      dataClinicas.error?.message ||
+      dataFarmacias.error?.message ||
+      "Error al consultar Places API (New)";
     throw new Error(`Google Places: ${errorMsg}`);
   }
 
-  const clinicas = (dataClinicas.results || []).map((place: any) => ({
-    id: place.place_id,
-    nombre: place.name,
-    latitud: place.geometry.location.lat,
-    longitud: place.geometry.location.lng,
+  const clinicas = (dataClinicas.places || []).map((place: any) => ({
+    id: place.id,
+    nombre: place.displayName?.text || "Centro Médico",
+    latitud: place.location?.latitude,
+    longitud: place.location?.longitude,
     tipo: "clinica" as const,
-  }));
+  })).filter((c: Lugar) => c.latitud !== undefined && c.longitud !== undefined);
 
-  const farmacias = (dataFarmacias.results || []).map((place: any) => ({
-    id: place.place_id,
-    nombre: place.name,
-    latitud: place.geometry.location.lat,
-    longitud: place.geometry.location.lng,
+  const farmacias = (dataFarmacias.places || []).map((place: any) => ({
+    id: place.id,
+    nombre: place.displayName?.text || "Farmacia",
+    latitud: place.location?.latitude,
+    longitud: place.location?.longitude,
     tipo: "farmacia" as const,
-  }));
+  })).filter((f: Lugar) => f.latitud !== undefined && f.longitud !== undefined);
 
   return [...clinicas, ...farmacias];
 }

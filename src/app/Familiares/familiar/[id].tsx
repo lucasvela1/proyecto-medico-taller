@@ -1,4 +1,4 @@
-import { familiares } from "@/app/data/familiares";
+import { familiares } from "@/data/familiares";
 import {
   adicionalesRoute,
   datosClinicosRoute,

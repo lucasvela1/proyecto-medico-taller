@@ -1,4 +1,4 @@
-import { ContactoEmergencia, familiares } from "@/app/data/familiares";
+import { ContactoEmergencia, familiares } from "@/data/familiares";
 import { useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import {

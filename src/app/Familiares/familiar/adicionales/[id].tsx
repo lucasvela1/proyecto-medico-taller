@@ -1,4 +1,4 @@
-import { familiares, ItemClinico } from "@/app/data/familiares";
+import { familiares, ItemClinico } from "@/data/familiares";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
 import { useState } from "react";

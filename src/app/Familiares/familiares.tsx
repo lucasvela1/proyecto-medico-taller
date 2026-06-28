@@ -1,4 +1,4 @@
-import { Familiar, familiares } from "@/app/data/familiares";
+import { Familiar, familiares } from "@/data/familiares";
 import { fichaShowRoute } from "@/navigation/routes";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";

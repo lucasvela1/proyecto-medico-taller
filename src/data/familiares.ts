@@ -46,7 +46,7 @@ export const familiares: Familiar[] = [
     nombre: "Lucia",
     apellido: "Gomez",
     relacion: "Madre",
-    imagenUrl: require("../../assets/images/LuciaImagen.png"),
+    imagenUrl: require("../assets/images/LuciaImagen.png"),
     identidad: {
       dni: "23123456",
       fechaNacimiento: "15/07/1974",
