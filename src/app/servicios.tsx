@@ -18,7 +18,7 @@ type Lugar = {
   tipo: "clinica" | "farmacia";
 };
 
-const GOOGLE_API_KEY = "AIzaSyAGoowL67JkTtIgo4XFgLkoYrVIHn4oX8M";
+const GOOGLE_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_API_KEY || "";
 
 async function buscarLugaresCercanos(lat: number, lon: number): Promise<Lugar[]> {
   const radio = 5000; // 5 km (5000 metros)
