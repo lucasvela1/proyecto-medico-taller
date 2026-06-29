@@ -1,4 +1,8 @@
 module.exports = ({ config }) => {
+  const GOOGLE_API_KEY =
+    process.env.EXPO_PUBLIC_GOOGLE_API_KEY ||
+    "AIzaSyAGoowL67JkTtIgo4XFgLkoYrVIHn4oX8M";
+
   return {
     ...config,
     plugins: [
@@ -6,8 +10,8 @@ module.exports = ({ config }) => {
       [
         "react-native-maps",
         {
-          androidGoogleMapsApiKey: process.env.EXPO_PUBLIC_GOOGLE_API_KEY,
-          iosGoogleMapsApiKey: process.env.EXPO_PUBLIC_GOOGLE_API_KEY,
+          androidGoogleMapsApiKey: GOOGLE_API_KEY,
+          iosGoogleMapsApiKey: GOOGLE_API_KEY,
         },
       ],
     ],
@@ -15,7 +19,7 @@ module.exports = ({ config }) => {
       ...config.ios,
       config: {
         ...config.ios?.config,
-        googleMapsApiKey: process.env.EXPO_PUBLIC_GOOGLE_API_KEY,
+        googleMapsApiKey: GOOGLE_API_KEY,
       },
     },
     android: {
@@ -23,7 +27,7 @@ module.exports = ({ config }) => {
       config: {
         ...config.android?.config,
         googleMaps: {
-          apiKey: process.env.EXPO_PUBLIC_GOOGLE_API_KEY,
+          apiKey: GOOGLE_API_KEY,
         },
       },
     },
