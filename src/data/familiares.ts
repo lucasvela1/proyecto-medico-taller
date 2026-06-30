@@ -42,6 +42,41 @@ export type Familiar = {
 };
 export const familiares: Familiar[] = [
   {
+    id: "yo",
+    nombre: "Lucas",
+    apellido: "Vela",
+    relacion: "Yo",
+    imagenUrl: { uri: "https://picsum.photos/seed/yo/200/200" },
+    identidad: {
+      dni: "12345678",
+      fechaNacimiento: "10/10/1995",
+      contactosEmergencia: [
+        {
+          id: "ce-yo-001",
+          nombreApellido: "Martin Gomez",
+          relacion: "Contacto de Emergencia",
+          numeroTel: "+54 11 5555-9999",
+          direccion: "Av. Siempre Viva 123",
+        },
+      ],
+    },
+    datosClinicos: {
+      grupoSanguineo: "O+",
+      alergias: [{ id: "al-yo-001", nombre: "Polen" }],
+      enfermedades: [],
+      medicamentos: [],
+      coberturaMedica: "Osde 310",
+      numeroAfiliado: "12345678",
+    },
+    adicionales: {
+      peso: "75 kg",
+      altura: "1.80 m",
+      dispositivosMedicos: [],
+      esDonante: true,
+      notas: "Usuario principal de la aplicación.",
+    },
+  },
+  {
     id: "fam-001",
     nombre: "Lucia",
     apellido: "Gomez",

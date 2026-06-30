@@ -19,6 +19,7 @@ export default function FamiliaresScreen() {
 
   const filtro = texto.trim().toLowerCase();
   const familiaresFiltrados = familiares.filter((familiar) => {
+    if (familiar.id === "yo") return false;
     const nombreCompleto =
       `${familiar.nombre} ${familiar.apellido}`.toLowerCase();
     return nombreCompleto.includes(filtro);
@@ -34,7 +35,7 @@ export default function FamiliaresScreen() {
           <>
             <Pressable
               onPress={() => {
-                // Placeholder for future navigation to create familiar screen.
+                // Placeholder para agregar familiares
               }}
               style={({ pressed }) => [
                 styles.addCard,
