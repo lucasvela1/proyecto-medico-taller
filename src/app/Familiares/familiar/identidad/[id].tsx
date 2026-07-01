@@ -1,8 +1,8 @@
 import { ContactoEmergencia, familiares, guardarFamiliaresEnAlmacenamiento } from "@/data/familiares";
+import { AppModalAlert } from "@/components/AppModalAlert";
 import { useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import {
-  Alert,
   FlatList,
   Modal,
   Pressable,
@@ -31,6 +31,12 @@ export default function IdentidadScreen() {
   const [editingContactoId, setEditingContactoId] = useState<string | null>(
     null,
   );
+  const [alertModal, setAlertModal] = useState<{ visible: boolean; tipo: "exito" | "error"; titulo: string; mensaje: string }>({
+    visible: false,
+    tipo: "exito",
+    titulo: "",
+    mensaje: "",
+  });
 
   const [nuevoNombreApellido, setNuevoNombreApellido] = useState("");
   const [nuevaRelacion, setNuevaRelacion] = useState("");
@@ -56,7 +62,7 @@ export default function IdentidadScreen() {
         contactosEmergencia: contactos,
       };
       guardarFamiliaresEnAlmacenamiento();
-      Alert.alert("Guardado", "Los datos fueron guardados correctamente.");
+      setAlertModal({ visible: true, tipo: "exito", titulo: "Guardado", mensaje: "Los datos fueron guardados correctamente." });
     }
   };
 
@@ -76,7 +82,7 @@ export default function IdentidadScreen() {
 
   const guardarContacto = () => {
     if (!nuevoNombreApellido.trim() || !nuevaRelacion.trim()) {
-      Alert.alert("Faltan datos", "Nombre y relacion son obligatorios.");
+      setAlertModal({ visible: true, tipo: "error", titulo: "Faltan datos", mensaje: "Nombre y relación son obligatorios." });
       return;
     }
 
@@ -263,6 +269,14 @@ export default function IdentidadScreen() {
           </View>
         </View>
       </Modal>
+
+      <AppModalAlert
+        visible={alertModal.visible}
+        tipo={alertModal.tipo}
+        titulo={alertModal.titulo}
+        mensaje={alertModal.mensaje}
+        onClose={() => setAlertModal((prev) => ({ ...prev, visible: false }))}
+      />
     </>
   );
 }

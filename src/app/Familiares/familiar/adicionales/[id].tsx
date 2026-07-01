@@ -1,9 +1,9 @@
 import { familiares, ItemClinico, guardarFamiliaresEnAlmacenamiento } from "@/data/familiares";
+import { AppModalAlert } from "@/components/AppModalAlert";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import {
-    Alert,
     FlatList,
     Modal,
     Pressable,
@@ -33,6 +33,12 @@ export default function AdicionalesScreen() {
     string | null
   >(null);
   const [nuevoDispositivo, setNuevoDispositivo] = useState("");
+  const [alertModal, setAlertModal] = useState<{ visible: boolean; tipo: "exito" | "error"; titulo: string; mensaje: string }>({
+    visible: false,
+    tipo: "exito",
+    titulo: "",
+    mensaje: "",
+  });
 
   const resetDispositivoForm = () => {
     setNuevoDispositivo("");
@@ -52,7 +58,7 @@ export default function AdicionalesScreen() {
 
   const guardarDispositivo = () => {
     if (!nuevoDispositivo.trim()) {
-      Alert.alert("Falta el dato", "El nombre del dispositivo es obligatorio.");
+      setAlertModal({ visible: true, tipo: "error", titulo: "Falta el dato", mensaje: "El nombre del dispositivo es obligatorio." });
       return;
     }
 
@@ -86,10 +92,7 @@ export default function AdicionalesScreen() {
         dispositivosMedicos: dispositivos,
       };
       guardarFamiliaresEnAlmacenamiento();
-      Alert.alert(
-        "Guardado",
-        "Los datos adicionales fueron guardados correctamente.",
-      );
+      setAlertModal({ visible: true, tipo: "exito", titulo: "Guardado", mensaje: "Los datos adicionales fueron guardados correctamente." });
     }
   };
 
@@ -255,6 +258,14 @@ export default function AdicionalesScreen() {
           </View>
         </View>
       </Modal>
+
+      <AppModalAlert
+        visible={alertModal.visible}
+        tipo={alertModal.tipo}
+        titulo={alertModal.titulo}
+        mensaje={alertModal.mensaje}
+        onClose={() => setAlertModal((prev) => ({ ...prev, visible: false }))}
+      />
     </>
   );
 }

@@ -1,8 +1,8 @@
 import { familiares, ItemClinico, guardarFamiliaresEnAlmacenamiento } from "@/data/familiares";
+import { AppModalAlert } from "@/components/AppModalAlert";
 import { useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import {
-    Alert,
     FlatList,
     Modal,
     Pressable,
@@ -43,6 +43,12 @@ export default function DatosClinicosScreen() {
   const [listaActiva, setListaActiva] = useState<ListaClinica | null>(null);
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
   const [nuevoItemNombre, setNuevoItemNombre] = useState("");
+  const [alertModal, setAlertModal] = useState<{ visible: boolean; tipo: "exito" | "error"; titulo: string; mensaje: string }>({
+    visible: false,
+    tipo: "exito",
+    titulo: "",
+    mensaje: "",
+  });
 
   const listaConfig: Record<ListaClinica, { titulo: string; vacio: string }> = {
     alergias: {
@@ -105,7 +111,7 @@ export default function DatosClinicosScreen() {
     }
 
     if (!nuevoItemNombre.trim()) {
-      Alert.alert("Falta el dato", "El nombre del elemento es obligatorio.");
+      setAlertModal({ visible: true, tipo: "error", titulo: "Falta el dato", mensaje: "El nombre del elemento es obligatorio." });
       return;
     }
 
@@ -138,10 +144,7 @@ export default function DatosClinicosScreen() {
         medicamentos: medicamentos,
       };
       guardarFamiliaresEnAlmacenamiento();
-      Alert.alert(
-        "Guardado",
-        "Los datos clinicos fueron guardados correctamente.",
-      );
+      setAlertModal({ visible: true, tipo: "exito", titulo: "Guardado", mensaje: "Los datos clínicos fueron guardados correctamente." });
     }
   };
 
@@ -290,6 +293,14 @@ export default function DatosClinicosScreen() {
           </View>
         </View>
       </Modal>
+
+      <AppModalAlert
+        visible={alertModal.visible}
+        tipo={alertModal.tipo}
+        titulo={alertModal.titulo}
+        mensaje={alertModal.mensaje}
+        onClose={() => setAlertModal((prev) => ({ ...prev, visible: false }))}
+      />
     </>
   );
 }

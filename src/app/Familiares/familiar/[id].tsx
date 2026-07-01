@@ -1,14 +1,14 @@
 import { familiares } from "@/data/familiares";
+import { useImagePicker } from "@/hooks/use-image-picker";
 import {
   adicionalesRoute,
   datosClinicosRoute,
   identidadRoute,
 } from "@/navigation/routes";
 import { Ionicons } from "@expo/vector-icons";
-import { useLocalSearchParams, useRouter } from "expo-router";
 import { useIsFocused } from "@react-navigation/native";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { Image, Modal, Pressable, StyleSheet, Text, View } from "react-native";
-import { useImagePicker } from "@/hooks/use-image-picker";
 
 export default function FamiliarDetalleScreen() {
   const router = useRouter();
