@@ -1,19 +1,21 @@
 import { familiares } from "@/data/familiares";
+import { useFamiliaresReactive } from "@/hooks/use-familiares-reactive";
+import { useImagePicker } from "@/hooks/use-image-picker";
 import {
   adicionalesRoute,
   datosClinicosRoute,
   identidadRoute,
 } from "@/navigation/routes";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
 import { useIsFocused } from "@react-navigation/native";
+import { useRouter } from "expo-router";
 import { Image, Modal, Pressable, StyleSheet, Text, View } from "react-native";
-import { useImagePicker } from "@/hooks/use-image-picker";
 
 export default function YoScreen() {
   const router = useRouter();
   const isFocused = useIsFocused();
   const id = "yo";
+  useFamiliaresReactive();
   const familiar = familiares.find((item) => item.id === id);
 
   const {
@@ -30,6 +32,35 @@ export default function YoScreen() {
     return (
       <View style={styles.screen}>
         <Text style={styles.notFoundText}>Usuario no encontrado</Text>
+      </View>
+    );
+  }
+
+  // Empty state: primera vez que se abre la app sin datos cargados
+  const sinDatos = !familiar.nombre.trim() && !familiar.apellido.trim();
+  if (sinDatos) {
+    return (
+      <View style={styles.screen}>
+        <View style={styles.emptyStateContainer}>
+          <View style={styles.emptyIconCircle}>
+            <Ionicons name="person-outline" size={52} color="#6E9DD7" />
+          </View>
+          <Text style={styles.emptyTitle}>Aún no hay datos cargados</Text>
+          <Text style={styles.emptySubtitle}>
+            Completá tu perfil personal para que tus datos estén disponibles en
+            caso de emergencia.
+          </Text>
+          <Pressable
+            onPress={() => router.push(identidadRoute(familiar.id))}
+            style={({ pressed }) => [
+              styles.emptyButton,
+              pressed && styles.emptyButtonPressed,
+            ]}
+          >
+            <Ionicons name="create-outline" size={20} color="#FFFFFF" />
+            <Text style={styles.emptyButtonText}>Cargar mis datos</Text>
+          </Pressable>
+        </View>
       </View>
     );
   }
@@ -239,6 +270,59 @@ const styles = StyleSheet.create({
     color: "#7A8795",
     textAlign: "center",
     marginTop: 40,
+  },
+  emptyStateContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 32,
+    gap: 12,
+  },
+  emptyIconCircle: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: "#112240",
+    borderWidth: 1,
+    borderColor: "#2A4E7C",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  emptyTitle: {
+    fontSize: 22,
+    fontWeight: "800",
+    color: "#F0F8FF",
+    textAlign: "center",
+  },
+  emptySubtitle: {
+    fontSize: 15,
+    color: "#8AA9C9",
+    textAlign: "center",
+    lineHeight: 22,
+    marginBottom: 8,
+  },
+  emptyButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 10,
+    marginTop: 8,
+    paddingHorizontal: 28,
+    paddingVertical: 16,
+    borderRadius: 14,
+    backgroundColor: "#1A5A8A",
+    borderWidth: 1,
+    borderColor: "#4A8FC4",
+  },
+  emptyButtonPressed: {
+    opacity: 0.85,
+    transform: [{ scale: 0.98 }],
+  },
+  emptyButtonText: {
+    color: "#FFFFFF",
+    fontSize: 17,
+    fontWeight: "800",
   },
   modalOverlay: {
     flex: 1,

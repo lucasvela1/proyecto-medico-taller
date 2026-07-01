@@ -50,10 +50,9 @@ export type Familiar = {
 export const familiares: Familiar[] = [
   {
     id: "yo",
-    nombre: "Lucas",
-    apellido: "Vela",
+    nombre: "",
+    apellido: "",
     relacion: "Yo",
-    imagenUrl: { uri: "https://picsum.photos/seed/yo/200/200" },
     identidad: {
       dni: "12345678",
       fechaNacimiento: "10/10/1995",
