@@ -52,9 +52,13 @@ export default function IdentidadScreen() {
   };
 
   const guardarCambios = () => {
+    if (!nombre.trim() || !apellido.trim()) {
+      setAlertModal({ visible: true, tipo: "error", titulo: "Datos obligatorios", mensaje: "El nombre y el apellido son campos obligatorios." });
+      return;
+    }
     if (familiar) {
-      familiar.nombre = nombre;
-      familiar.apellido = apellido;
+      familiar.nombre = nombre.trim();
+      familiar.apellido = apellido.trim();
       familiar.identidad = {
         ...familiar.identidad,
         dni: dni,
@@ -63,6 +67,7 @@ export default function IdentidadScreen() {
       };
       guardarFamiliaresEnAlmacenamiento();
       setAlertModal({ visible: true, tipo: "exito", titulo: "Guardado", mensaje: "Los datos fueron guardados correctamente." });
+
     }
   };
 
