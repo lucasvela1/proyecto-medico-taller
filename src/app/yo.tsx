@@ -31,6 +31,7 @@ export default function YoScreen() {
   } = useImagePicker(id, familiar?.imagenUrl);
 
   const [isAlertModalVisible, setIsAlertModalVisible] = useState(false);
+  const [isQrModalVisible, setIsQrModalVisible] = useState(false);
   const [errorModal, setErrorModal] = useState<{ visible: boolean; titulo: string; mensaje: string }>({
     visible: false,
     titulo: "",
@@ -133,6 +134,17 @@ export default function YoScreen() {
           <Text style={styles.menuText}>Adicionales</Text>
         </Pressable>
       </View>
+
+      <Pressable
+        onPress={() => setIsQrModalVisible(true)}
+        style={({ pressed }) => [
+          styles.shareDataButton,
+          pressed && styles.shareDataButtonPressed,
+        ]}
+      >
+        <Ionicons name="qr-code-outline" size={20} color="#FFFFFF" />
+        <Text style={styles.shareDataText}>Compartir mis datos (QR)</Text>
+      </Pressable>
 
       <Pressable
         onPress={() => {
@@ -340,6 +352,53 @@ export default function YoScreen() {
         mensaje={errorModal.mensaje}
         onClose={() => setErrorModal((prev) => ({ ...prev, visible: false }))}
       />
+
+      {/* Modal del Código QR de exportación */}
+      <Modal
+        visible={isQrModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setIsQrModalVisible(false)}
+      >
+        <Pressable style={styles.modalOverlay} onPress={() => setIsQrModalVisible(false)}>
+          <Pressable style={styles.qrModalContainer} onPress={() => {}}>
+            <View style={styles.qrIconCircle}>
+              <Ionicons name="qr-code" size={32} color="#4ADE80" />
+            </View>
+            <Text style={styles.qrModalTitle}>Código QR de mis datos</Text>
+            <Text style={styles.qrModalSubtitle}>
+              Escaneá este código desde otro celular para importar este perfil médico al instante:
+            </Text>
+
+            <View style={styles.qrWrapper}>
+              <Image
+                source={{
+                  uri: `https://api.qrserver.com/v1/create-qr-code/?size=250x250&color=112240&data=${encodeURIComponent(
+                    JSON.stringify({
+                      nombre: familiar.nombre,
+                      apellido: familiar.apellido,
+                      identidad: familiar.identidad || {},
+                      datosClinicos: familiar.datosClinicos || {},
+                      adicionales: familiar.adicionales || {},
+                    })
+                  )}`,
+                }}
+                style={styles.qrImage}
+              />
+            </View>
+
+            <Pressable
+              onPress={() => setIsQrModalVisible(false)}
+              style={({ pressed }) => [
+                styles.qrModalCloseButton,
+                pressed && styles.modalButtonPressed,
+              ]}
+            >
+              <Text style={styles.qrModalCloseText}>Cerrar</Text>
+            </Pressable>
+          </Pressable>
+        </Pressable>
+      </Modal>
     </View>
   );
 }
@@ -665,6 +724,96 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   alertModalCloseText: {
+    color: "#EAF4FF",
+    fontSize: 16,
+    fontWeight: "700",
+  },
+  shareDataButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 10,
+    marginTop: 20,
+    minHeight: 56,
+    borderRadius: 14,
+    backgroundColor: "#1D4ED8",
+    borderWidth: 1,
+    borderColor: "#3B82F6",
+  },
+  shareDataButtonPressed: {
+    opacity: 0.85,
+    transform: [{ scale: 0.98 }],
+  },
+  shareDataText: {
+    color: "#FFFFFF",
+    fontSize: 17,
+    fontWeight: "800",
+  },
+  qrModalContainer: {
+    width: "100%",
+    maxWidth: 340,
+    backgroundColor: "#112240",
+    borderWidth: 1,
+    borderColor: "#2A4E7C",
+    borderRadius: 20,
+    padding: 24,
+    alignItems: "center",
+    gap: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.4,
+    shadowRadius: 16,
+    elevation: 12,
+  },
+  qrIconCircle: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: "rgba(74, 222, 128, 0.12)",
+    borderWidth: 1,
+    borderColor: "rgba(74, 222, 128, 0.3)",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 4,
+  },
+  qrModalTitle: {
+    fontSize: 20,
+    fontWeight: "800",
+    color: "#F0F8FF",
+    textAlign: "center",
+  },
+  qrModalSubtitle: {
+    fontSize: 14,
+    color: "#A8C8E8",
+    textAlign: "center",
+    lineHeight: 20,
+    marginBottom: 8,
+  },
+  qrWrapper: {
+    width: 200,
+    height: 200,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 12,
+    padding: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  qrImage: {
+    width: 180,
+    height: 180,
+  },
+  qrModalCloseButton: {
+    width: "100%",
+    minHeight: 48,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#4B79B6",
+    backgroundColor: "transparent",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  qrModalCloseText: {
     color: "#EAF4FF",
     fontSize: 16,
     fontWeight: "700",

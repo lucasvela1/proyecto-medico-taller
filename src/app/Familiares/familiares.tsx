@@ -1,6 +1,8 @@
+import { AppModalAlert } from "@/components/AppModalAlert";
 import { Familiar, familiares, guardarFamiliaresEnAlmacenamiento, notificarCambioFamiliares, suscribirFamiliares } from "@/data/familiares";
 import { crearFamiliarRoute, fichaShowRoute } from "@/navigation/routes";
 import { Ionicons } from "@expo/vector-icons";
+import { CameraView, useCameraPermissions } from "expo-camera";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
@@ -8,11 +10,24 @@ import {
   Image,
   Modal,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   View,
 } from "react-native";
+
+const VINCULOS = [
+  "Madre",
+  "Padre",
+  "Hermano/a",
+  "Primo/a",
+  "Tío/a",
+  "Abuelo/a",
+  "Otro",
+] as const;
+
+type Vinculo = (typeof VINCULOS)[number];
 
 function getFamiliaresSinYo(): Familiar[] {
   return familiares.filter((f) => f.id !== "yo");
@@ -22,6 +37,19 @@ export default function FamiliaresScreen() {
   const router = useRouter();
   const [texto, setTexto] = useState("");
   const [todosLosFamiliares, setTodosLosFamiliares] = useState<Familiar[]>(getFamiliaresSinYo);
+
+  // Estados para Importación QR
+  const [permission, requestPermission] = useCameraPermissions();
+  const [isVinculoModalVisible, setIsVinculoModalVisible] = useState(false);
+  const [isCameraModalVisible, setIsCameraModalVisible] = useState(false);
+  const [vincSelect, setVincSelect] = useState<Vinculo | null>(null);
+  const [vincOtro, setVincOtro] = useState("");
+  const [alertModal, setAlertModal] = useState<{
+    visible: boolean;
+    tipo: "exito" | "error";
+    titulo: string;
+    mensaje: string;
+  }>({ visible: false, tipo: "exito", titulo: "", mensaje: "" });
 
   useEffect(() => {
     const desuscribir = suscribirFamiliares(() => {
@@ -36,6 +64,100 @@ export default function FamiliaresScreen() {
         `${f.nombre} ${f.apellido}`.toLowerCase().includes(filtro)
       )
     : todosLosFamiliares;
+
+  // Handler para iniciar importación
+  const iniciarImportacion = async () => {
+    // Primero solicitamos o comprobamos permisos de cámara
+    if (!permission) {
+      // Cargando permisos
+      return;
+    }
+    if (!permission.granted) {
+      const res = await requestPermission();
+      if (!res.granted) {
+        setAlertModal({
+          visible: true,
+          tipo: "error",
+          titulo: "Permiso denegado",
+          mensaje: "Se requiere acceso a la cámara para poder escanear el código QR.",
+        });
+        return;
+      }
+    }
+    // Una vez que tenemos permisos, abrimos primero el modal del vínculo
+    setVincSelect(null);
+    setVincOtro("");
+    setIsVinculoModalVisible(true);
+  };
+
+  const confirmarVinculo = () => {
+    if (!vincSelect) {
+      setAlertModal({
+        visible: true,
+        tipo: "error",
+        titulo: "Vínculo requerido",
+        mensaje: "Por favor elegí el vínculo del familiar antes de escanear.",
+      });
+      return;
+    }
+    if (vincSelect === "Otro" && !vincOtro.trim()) {
+      setAlertModal({
+        visible: true,
+        tipo: "error",
+        titulo: "Especificá el vínculo",
+        mensaje: "Escribí el vínculo en el campo de texto correspondiente.",
+      });
+      return;
+    }
+    // Si es correcto, pasamos a abrir la cámara
+    setIsVinculoModalVisible(false);
+    setIsCameraModalVisible(true);
+  };
+
+  const handleBarcodeScanned = ({ data }: { data: string }) => {
+    // Cerramos cámara inmediatamente
+    setIsCameraModalVisible(false);
+    try {
+      const datosImportados = JSON.parse(data);
+      if (!datosImportados.nombre || !datosImportados.apellido) {
+        throw new Error("Formato inválido");
+      }
+
+      const relacion = vincSelect === "Otro" ? vincOtro.trim() : vincSelect;
+      const nuevoId = `fam-import-${Date.now()}`;
+
+      const nuevoFamiliar: Familiar = {
+        id: nuevoId,
+        nombre: datosImportados.nombre,
+        apellido: datosImportados.apellido,
+        relacion: relacion || "Familiar",
+        identidad: datosImportados.identidad || {},
+        datosClinicos: datosImportados.datosClinicos || {},
+        adicionales: datosImportados.adicionales || {},
+      };
+
+      familiares.push(nuevoFamiliar);
+      notificarCambioFamiliares();
+      guardarFamiliaresEnAlmacenamiento();
+
+      setAlertModal({
+        visible: true,
+        tipo: "exito",
+        titulo: "Importación exitosa",
+        mensaje: `Se importó a ${nuevoFamiliar.nombre} ${nuevoFamiliar.apellido} correctamente.`,
+      });
+
+      // Redirigir a su detalle después del éxito
+      router.push(fichaShowRoute(nuevoId));
+    } catch {
+      setAlertModal({
+        visible: true,
+        tipo: "error",
+        titulo: "Error al importar",
+        mensaje: "El código QR escaneado no contiene un formato de perfil válido de esta aplicación.",
+      });
+    }
+  };
 
   return (
     <View style={styles.screen}>
@@ -54,6 +176,17 @@ export default function FamiliaresScreen() {
             >
               <Text style={styles.addSign}>+</Text>
               <Text style={styles.addText}>Agregar familiar</Text>
+            </Pressable>
+
+            <Pressable
+              onPress={iniciarImportacion}
+              style={({ pressed }) => [
+                styles.importCard,
+                pressed && styles.addCardPressed,
+              ]}
+            >
+              <Ionicons name="qr-code-outline" size={24} color="#F4FAFF" />
+              <Text style={styles.addText}>Importar familiar (QR)</Text>
             </Pressable>
 
             <Text style={styles.title}>Familiares</Text>
@@ -90,6 +223,113 @@ export default function FamiliaresScreen() {
         ListEmptyComponent={
           <Text style={styles.emptyText}>No se encontraron familiares</Text>
         }
+      />
+
+      {/* Modal para elegir el vínculo antes de escanear */}
+      <Modal
+        visible={isVinculoModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setIsVinculoModalVisible(false)}
+      >
+        <View style={styles.confirmOverlay}>
+          <View style={styles.vincCard}>
+            <Text style={styles.confirmTitle}>¿Qué familiar estás agregando?</Text>
+            <Text style={styles.vincSubtitle}>Seleccioná el vínculo del familiar a importar:</Text>
+
+            <ScrollView style={{ maxHeight: 280, width: "100%", marginVertical: 10 }}>
+              <View style={styles.radioGroup}>
+                {VINCULOS.map((v) => {
+                  const selected = vincSelect === v;
+                  return (
+                    <Pressable
+                      key={v}
+                      onPress={() => setVincSelect(v)}
+                      style={[styles.radioRow, selected && styles.radioRowSelected]}
+                    >
+                      <View style={[styles.radioCircle, selected && styles.radioCircleFilled]}>
+                        {selected && <View style={styles.radioDot} />}
+                      </View>
+                      <Text style={[styles.radioLabel, selected && styles.radioLabelSelected]}>
+                        {v}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+
+              {vincSelect === "Otro" && (
+                <View style={{ marginTop: 10 }}>
+                  <Text style={styles.vincInputLabel}>Especificá el vínculo:</Text>
+                  <TextInput
+                    style={styles.vincInput}
+                    value={vincOtro}
+                    onChangeText={setVincOtro}
+                    placeholder="Ej: Cuñado, Padrino..."
+                    placeholderTextColor="#6D89A8"
+                  />
+                </View>
+              )}
+            </ScrollView>
+
+            <View style={styles.confirmActions}>
+              <Pressable
+                onPress={() => setIsVinculoModalVisible(false)}
+                style={({ pressed }) => [styles.confirmCancel, pressed && styles.confirmPressed]}
+              >
+                <Text style={styles.confirmCancelText}>Cancelar</Text>
+              </Pressable>
+              <Pressable
+                onPress={confirmarVinculo}
+                style={({ pressed }) => [styles.confirmNext, pressed && styles.confirmPressed]}
+              >
+                <Text style={styles.confirmNextText}>Siguiente</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Modal de Escáner QR de Cámara */}
+      <Modal
+        visible={isCameraModalVisible}
+        transparent={false}
+        animationType="slide"
+        onRequestClose={() => setIsCameraModalVisible(false)}
+      >
+        <View style={{ flex: 1, backgroundColor: "#000000" }}>
+          <CameraView
+            style={StyleSheet.absoluteFillObject}
+            facing="back"
+            onBarcodeScanned={handleBarcodeScanned}
+            barcodeScannerSettings={{
+              barcodeTypes: ["qr"],
+            }}
+          />
+          {/* Overlay del Lector */}
+          <View style={styles.scannerOverlay}>
+            <View style={styles.scanTargetArea} />
+            <Text style={styles.scannerText}>Apuntá la cámara al código QR de salud</Text>
+            
+            <Pressable
+              onPress={() => setIsCameraModalVisible(false)}
+              style={({ pressed }) => [
+                styles.scannerCancelButton,
+                pressed && styles.confirmPressed,
+              ]}
+            >
+              <Text style={styles.scannerCancelText}>Cancelar escaneo</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+
+      <AppModalAlert
+        visible={alertModal.visible}
+        tipo={alertModal.tipo}
+        titulo={alertModal.titulo}
+        mensaje={alertModal.mensaje}
+        onClose={() => setAlertModal((prev) => ({ ...prev, visible: false }))}
       />
     </View>
   );
@@ -234,6 +474,18 @@ const styles = StyleSheet.create({
     backgroundColor: "#173867",
     borderWidth: 1,
     borderColor: "#4B79B6",
+    marginBottom: 10,
+  },
+  importCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 10,
+    minHeight: 72,
+    borderRadius: 14,
+    backgroundColor: "#0F2E52",
+    borderWidth: 1,
+    borderColor: "#2A4E7C",
     marginBottom: 18,
   },
   addCardPressed: {
@@ -422,5 +674,145 @@ const styles = StyleSheet.create({
   confirmPressed: {
     opacity: 0.85,
     transform: [{ scale: 0.98 }],
+  },
+  vincCard: {
+    width: "100%",
+    maxWidth: 340,
+    backgroundColor: "#112240",
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "#2A4E7C",
+    padding: 24,
+    alignItems: "center",
+    gap: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.4,
+    shadowRadius: 16,
+    elevation: 12,
+  },
+  vincSubtitle: {
+    fontSize: 14,
+    color: "#A8C8E8",
+    textAlign: "center",
+    lineHeight: 20,
+    marginBottom: 8,
+  },
+  radioGroup: {
+    width: "100%",
+    gap: 8,
+  },
+  radioRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#2A4E7C",
+    backgroundColor: "#173867",
+  },
+  radioRowSelected: {
+    borderColor: "#4A8FC4",
+    backgroundColor: "#0F2E52",
+  },
+  radioCircle: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    borderWidth: 2,
+    borderColor: "#4B79B6",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  radioCircleFilled: {
+    borderColor: "#5BA3E0",
+  },
+  radioDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: "#5BA3E0",
+  },
+  radioLabel: {
+    fontSize: 15,
+    color: "#A8C8E8",
+    fontWeight: "600",
+  },
+  radioLabelSelected: {
+    color: "#EAF4FF",
+    fontWeight: "700",
+  },
+  vincInputLabel: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: "#EAF4FF",
+    marginBottom: 6,
+  },
+  vincInput: {
+    minHeight: 46,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#4B79B6",
+    backgroundColor: "#173867",
+    color: "#F4FAFF",
+    paddingHorizontal: 12,
+    fontSize: 15,
+  },
+  confirmNext: {
+    flex: 1,
+    minHeight: 48,
+    borderRadius: 12,
+    backgroundColor: "#1E6B40",
+    borderWidth: 1,
+    borderColor: "#2D9C5E",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  confirmNextText: {
+    color: "#FFFFFF",
+    fontWeight: "800",
+    fontSize: 15,
+  },
+  // Scanner
+  scannerOverlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
+  scanTargetArea: {
+    width: 250,
+    height: 250,
+    borderRadius: 24,
+    borderWidth: 3,
+    borderColor: "#4ADE80",
+    backgroundColor: "transparent",
+    marginBottom: 20,
+  },
+  scannerText: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#FFFFFF",
+    textAlign: "center",
+    paddingHorizontal: 30,
+    marginBottom: 40,
+    textShadowColor: "#000",
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 4,
+  },
+  scannerCancelButton: {
+    paddingHorizontal: 24,
+    paddingVertical: 14,
+    borderRadius: 12,
+    backgroundColor: "#B42318",
+    borderWidth: 1,
+    borderColor: "#E53E3E",
+  },
+  scannerCancelText: {
+    color: "#FFFFFF",
+    fontSize: 15,
+    fontWeight: "800",
   },
 });

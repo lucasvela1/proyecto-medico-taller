@@ -346,7 +346,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#0B1F3A",
   },
   scrollContent: {
-    paddingBottom: 24,
+    paddingBottom: 90,
   },
   header: {
     padding: 20,
@@ -375,6 +375,7 @@ const styles = StyleSheet.create({
   mapContainer: {
     height: 400,
     marginHorizontal: 16,
+    marginBottom: 20,
     borderRadius: 18,
     borderWidth: 1,
     borderColor: "#4B79B6",
