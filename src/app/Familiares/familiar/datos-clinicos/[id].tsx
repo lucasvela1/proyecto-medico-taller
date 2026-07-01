@@ -127,10 +127,21 @@ export default function DatosClinicosScreen() {
   };
 
   const guardarCambios = () => {
-    Alert.alert(
-      "Guardado",
-      "Los datos clinicos fueron guardados correctamente.",
-    );
+    if (familiar) {
+      familiar.datosClinicos = {
+        ...familiar.datosClinicos,
+        grupoSanguineo: grupoSanguineo,
+        coberturaMedica: coberturaMedica,
+        numeroAfiliado: numeroAfiliado,
+        alergias: alergias,
+        enfermedades: enfermedades,
+        medicamentos: medicamentos,
+      };
+      Alert.alert(
+        "Guardado",
+        "Los datos clinicos fueron guardados correctamente.",
+      );
+    }
   };
 
   const renderSeccionLista = (lista: ListaClinica) => {

@@ -2,6 +2,7 @@ import { Familiar, familiares } from "@/data/familiares";
 import { fichaShowRoute } from "@/navigation/routes";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { useIsFocused } from "@react-navigation/native";
 import { useEffect, useState } from "react";
 import {
   FlatList,
@@ -15,6 +16,7 @@ import {
 
 export default function FamiliaresScreen() {
   const router = useRouter();
+  const isFocused = useIsFocused();
   const [texto, setTexto] = useState("");
 
   const filtro = texto.trim().toLowerCase();

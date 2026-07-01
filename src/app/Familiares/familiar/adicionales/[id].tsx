@@ -76,10 +76,20 @@ export default function AdicionalesScreen() {
   };
 
   const guardarCambios = () => {
-    Alert.alert(
-      "Guardado",
-      "Los datos adicionales fueron guardados correctamente.",
-    );
+    if (familiar) {
+      familiar.adicionales = {
+        ...familiar.adicionales,
+        peso: peso,
+        altura: altura,
+        esDonante: esDonante,
+        notas: notas,
+        dispositivosMedicos: dispositivos,
+      };
+      Alert.alert(
+        "Guardado",
+        "Los datos adicionales fueron guardados correctamente.",
+      );
+    }
   };
 
   return (

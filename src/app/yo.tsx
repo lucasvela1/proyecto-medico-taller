@@ -6,6 +6,7 @@ import {
 } from "@/navigation/routes";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { useIsFocused } from "@react-navigation/native";
 import { useEffect, useState } from "react";
 import { Alert, Image, Modal, Pressable, StyleSheet, Text, View } from "react-native";
 
@@ -17,6 +18,7 @@ try {
 
 export default function YoScreen() {
   const router = useRouter();
+  const isFocused = useIsFocused();
   const id = "yo";
   const familiar = familiares.find((item) => item.id === id);
 

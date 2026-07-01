@@ -46,8 +46,17 @@ export default function IdentidadScreen() {
   };
 
   const guardarCambios = () => {
-    Alert.alert("Guardado", "Los datos fueron guardados correctamente."); //Aca faltaria conectar con el backend para guardar los cambios,
-    // pero como no hay dejo solo la alerta de que se guardo todo bien. Tambien se puede guardar internamente
+    if (familiar) {
+      familiar.nombre = nombre;
+      familiar.apellido = apellido;
+      familiar.identidad = {
+        ...familiar.identidad,
+        dni: dni,
+        fechaNacimiento: fechaNacimiento,
+        contactosEmergencia: contactos,
+      };
+      Alert.alert("Guardado", "Los datos fueron guardados correctamente.");
+    }
   };
 
   const abrirNuevoContacto = () => {
