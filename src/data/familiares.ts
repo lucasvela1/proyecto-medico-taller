@@ -1,5 +1,10 @@
 import { ImageSourcePropType } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+
+let AsyncStorage: any = null;
+try {
+  AsyncStorage = require("@react-native-async-storage/async-storage").default;
+} catch (e) {
+}
 
 export type ContactoEmergencia = {
   id: string;
@@ -7,7 +12,7 @@ export type ContactoEmergencia = {
   relacion: string;
   numeroTel: string;
   direccion: string;
-}; //Esto es un tipo para representar al contacto de emergencia, luego hacemos un arreglo de estos en familiar
+};
 
 export type ItemClinico = {
   id: string;
@@ -15,6 +20,7 @@ export type ItemClinico = {
 };
 
 export type Familiar = {
+  esFavorito?: boolean;
   id: string;
   nombre: string;
   apellido: string;
@@ -248,14 +254,31 @@ export const familiares: Familiar[] = [
 
 const STORAGE_KEY = "@familiares_data_v1";
 
+const listeners = new Set<() => void>();
+
+export function suscribirFamiliares(listener: () => void) {
+  listeners.add(listener);
+  return () => {
+    listeners.delete(listener);
+  };
+}
+
+export function notificarCambioFamiliares() {
+  listeners.forEach((listener) => listener());
+}
+
 export async function cargarFamiliaresDeAlmacenamiento() {
+  if (!AsyncStorage) {
+    console.warn("AsyncStorage no está disponible.");
+    return;
+  }
   try {
     const jsonValue = await AsyncStorage.getItem(STORAGE_KEY);
     if (jsonValue != null) {
       const datosCargados = JSON.parse(jsonValue);
-      // Mutamos el array en su lugar para mantener las referencias importadas en toda la app
       familiares.length = 0;
       familiares.push(...datosCargados);
+      notificarCambioFamiliares();
     }
   } catch (e) {
     console.error("Error al cargar familiares desde AsyncStorage:", e);
@@ -263,10 +286,17 @@ export async function cargarFamiliaresDeAlmacenamiento() {
 }
 
 export async function guardarFamiliaresEnAlmacenamiento() {
+  if (!AsyncStorage) {
+    console.warn("AsyncStorage no está disponible.");
+    notificarCambioFamiliares();
+    return;
+  }
   try {
     const jsonValue = JSON.stringify(familiares);
     await AsyncStorage.setItem(STORAGE_KEY, jsonValue);
+    notificarCambioFamiliares();
   } catch (e) {
     console.error("Error al guardar familiares en AsyncStorage:", e);
+    notificarCambioFamiliares();
   }
 }

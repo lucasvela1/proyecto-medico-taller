@@ -1,8 +1,7 @@
-import { Familiar, familiares } from "@/data/familiares";
+import { Familiar, familiares, guardarFamiliaresEnAlmacenamiento, notificarCambioFamiliares } from "@/data/familiares";
 import { fichaShowRoute } from "@/navigation/routes";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { useIsFocused } from "@react-navigation/native";
 import { useEffect, useState } from "react";
 import {
   FlatList,
@@ -13,11 +12,12 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { useFamiliaresReactive } from "@/hooks/use-familiares-reactive";
 
 export default function FamiliaresScreen() {
   const router = useRouter();
-  const isFocused = useIsFocused();
   const [texto, setTexto] = useState("");
+  const favoritesVersion = useFamiliaresReactive();
 
   const filtro = texto.trim().toLowerCase();
   const familiaresFiltrados = familiares.filter((familiar) => {
@@ -32,6 +32,7 @@ export default function FamiliaresScreen() {
       <FlatList
         data={familiaresFiltrados}
         keyExtractor={(item) => item.id}
+        extraData={favoritesVersion}
         contentContainerStyle={styles.listContent}
         ListHeaderComponent={
           <>
@@ -64,6 +65,12 @@ export default function FamiliaresScreen() {
           <FamiliarCard
             item={item}
             onPress={() => router.push(fichaShowRoute(item.id))}
+            onToggleFavorito={() => {
+              const actualmenteFav = item.esFavorito === true || item.esFavorito === "true";
+              item.esFavorito = !actualmenteFav;
+              notificarCambioFamiliares(); // Notificar sincrónicamente para actualizar la UI inmediatamente
+              guardarFamiliaresEnAlmacenamiento(); // Persiste en background
+            }}
           />
         )}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
@@ -75,12 +82,14 @@ export default function FamiliaresScreen() {
   );
 }
 
-function FamiliarCard({
+export function FamiliarCard({
   item,
   onPress,
+  onToggleFavorito,
 }: {
   item: Familiar;
   onPress: () => void;
+  onToggleFavorito?: () => void;
 }) {
   const [imageError, setImageError] = useState(false);
 
@@ -113,6 +122,22 @@ function FamiliarCard({
         </Text>
         <Text style={styles.relationText}>{item.relacion}</Text>
       </View>
+
+      {onToggleFavorito && (
+        <Pressable
+          onPress={(e) => {
+            e.stopPropagation(); // Evita que se abra el detalle al hacer clic en el corazón
+            onToggleFavorito();
+          }}
+          style={styles.heartButton}
+        >
+          <Ionicons
+            name={(item.esFavorito === true || item.esFavorito === "true") ? "heart" : "heart-outline"}
+            size={24}
+            color={(item.esFavorito === true || item.esFavorito === "true") ? "#EB5757" : "#8AA9C9"}
+          />
+        </Pressable>
+      )}
     </Pressable>
   );
 }
@@ -224,5 +249,10 @@ const styles = StyleSheet.create({
     marginTop: 12,
     fontSize: 16,
     color: "#52606D",
+  },
+  heartButton: {
+    padding: 6,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
