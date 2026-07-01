@@ -7,6 +7,7 @@ export const ROUTES = {
   IDENTIDAD: "/Familiares/familiar/identidad/[id]",
   DATOS_CLINICOS: "/Familiares/familiar/datos-clinicos/[id]",
   ADICIONALES: "/Familiares/familiar/adicionales/[id]",
+  CREAR_FAMILIAR: "/Familiares/crear",
   FAMILIARES: "/Familiares/familiares", //ruta para mostrar la lista de familiares.
   YO: "/yo",
   SERVICIOS: "/servicios",
@@ -40,4 +41,8 @@ export function datosClinicosRoute(id: string) {
 
 export function adicionalesRoute(id: string) {
   return buildRoute(ROUTES.ADICIONALES, { id });
+}
+
+export function crearFamiliarRoute(): Href {
+  return ROUTES.CREAR_FAMILIAR as Href;
 }

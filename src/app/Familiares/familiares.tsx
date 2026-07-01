@@ -1,5 +1,5 @@
-import { Familiar, familiares, guardarFamiliaresEnAlmacenamiento, notificarCambioFamiliares } from "@/data/familiares";
-import { fichaShowRoute } from "@/navigation/routes";
+import { Familiar, familiares, guardarFamiliaresEnAlmacenamiento, notificarCambioFamiliares, suscribirFamiliares } from "@/data/familiares";
+import { crearFamiliarRoute, fichaShowRoute } from "@/navigation/routes";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
@@ -12,34 +12,40 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { useFamiliaresReactive } from "@/hooks/use-familiares-reactive";
+
+function getFamiliaresSinYo(): Familiar[] {
+  return familiares.filter((f) => f.id !== "yo");
+}
 
 export default function FamiliaresScreen() {
   const router = useRouter();
   const [texto, setTexto] = useState("");
-  const favoritesVersion = useFamiliaresReactive();
+  const [todosLosFamiliares, setTodosLosFamiliares] = useState<Familiar[]>(getFamiliaresSinYo);
+
+  useEffect(() => {
+    const desuscribir = suscribirFamiliares(() => {
+      setTodosLosFamiliares(getFamiliaresSinYo());
+    });
+    return desuscribir;
+  }, []);
 
   const filtro = texto.trim().toLowerCase();
-  const familiaresFiltrados = familiares.filter((familiar) => {
-    if (familiar.id === "yo") return false;
-    const nombreCompleto =
-      `${familiar.nombre} ${familiar.apellido}`.toLowerCase();
-    return nombreCompleto.includes(filtro);
-  });
+  const familiaresFiltrados = filtro
+    ? todosLosFamiliares.filter((f) =>
+        `${f.nombre} ${f.apellido}`.toLowerCase().includes(filtro)
+      )
+    : todosLosFamiliares;
 
   return (
     <View style={styles.screen}>
       <FlatList
         data={familiaresFiltrados}
         keyExtractor={(item) => item.id}
-        extraData={favoritesVersion}
         contentContainerStyle={styles.listContent}
         ListHeaderComponent={
           <>
             <Pressable
-              onPress={() => {
-                // Placeholder para agregar familiares
-              }}
+              onPress={() => router.push(crearFamiliarRoute())}
               style={({ pressed }) => [
                 styles.addCard,
                 pressed && styles.addCardPressed,
