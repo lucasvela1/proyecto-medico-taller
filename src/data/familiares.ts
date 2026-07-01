@@ -1,4 +1,5 @@
 import { ImageSourcePropType } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export type ContactoEmergencia = {
   id: string;
@@ -244,3 +245,28 @@ export const familiares: Familiar[] = [
     },
   },
 ];
+
+const STORAGE_KEY = "@familiares_data_v1";
+
+export async function cargarFamiliaresDeAlmacenamiento() {
+  try {
+    const jsonValue = await AsyncStorage.getItem(STORAGE_KEY);
+    if (jsonValue != null) {
+      const datosCargados = JSON.parse(jsonValue);
+      // Mutamos el array en su lugar para mantener las referencias importadas en toda la app
+      familiares.length = 0;
+      familiares.push(...datosCargados);
+    }
+  } catch (e) {
+    console.error("Error al cargar familiares desde AsyncStorage:", e);
+  }
+}
+
+export async function guardarFamiliaresEnAlmacenamiento() {
+  try {
+    const jsonValue = JSON.stringify(familiares);
+    await AsyncStorage.setItem(STORAGE_KEY, jsonValue);
+  } catch (e) {
+    console.error("Error al guardar familiares en AsyncStorage:", e);
+  }
+}

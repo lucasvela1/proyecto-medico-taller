@@ -1,4 +1,4 @@
-import { ContactoEmergencia, familiares } from "@/data/familiares";
+import { ContactoEmergencia, familiares, guardarFamiliaresEnAlmacenamiento } from "@/data/familiares";
 import { useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import {
@@ -55,6 +55,7 @@ export default function IdentidadScreen() {
         fechaNacimiento: fechaNacimiento,
         contactosEmergencia: contactos,
       };
+      guardarFamiliaresEnAlmacenamiento();
       Alert.alert("Guardado", "Los datos fueron guardados correctamente.");
     }
   };

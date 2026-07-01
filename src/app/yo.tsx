@@ -7,14 +7,8 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useIsFocused } from "@react-navigation/native";
-import { useEffect, useState } from "react";
-import { Alert, Image, Modal, Pressable, StyleSheet, Text, View } from "react-native";
-
-let ImagePicker: any = null;
-try {
-  ImagePicker = require("expo-image-picker");
-} catch (e) {
-}
+import { Image, Modal, Pressable, StyleSheet, Text, View } from "react-native";
+import { useImagePicker } from "@/hooks/use-image-picker";
 
 export default function YoScreen() {
   const router = useRouter();
@@ -22,14 +16,15 @@ export default function YoScreen() {
   const id = "yo";
   const familiar = familiares.find((item) => item.id === id);
 
-  const [imageError, setImageError] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [imagen, setImagen] = useState(familiar?.imagenUrl);
-
-  useEffect(() => {
-    setImageError(false);
-    setImagen(familiar?.imagenUrl);
-  }, [familiar?.id, familiar?.imagenUrl]);
+  const {
+    imagen,
+    imageError,
+    setImageError,
+    modalVisible,
+    setModalVisible,
+    handleCamera,
+    handleGallery,
+  } = useImagePicker(id, familiar?.imagenUrl);
 
   if (!familiar) {
     return (
@@ -38,74 +33,6 @@ export default function YoScreen() {
       </View>
     );
   }
-
-  const updateFamiliarImage = (newUri: string) => {
-    const f = familiares.find((item) => item.id === id);
-    if (f) {
-      f.imagenUrl = { uri: newUri };
-      setImagen({ uri: newUri });
-    }
-  };
-
-  const handleCamera = async () => {
-    setModalVisible(false);
-    if (!ImagePicker || !ImagePicker.requestCameraPermissionsAsync) {
-      return;
-    }
-
-    const permission = await ImagePicker.requestCameraPermissionsAsync();
-    if (!permission.granted) {
-      Alert.alert(
-        "Permiso denegado",
-        "Se necesitan permisos de cámara para tomar fotos."
-      );
-      return;
-    }
-
-    try {
-      const result = await ImagePicker.launchCameraAsync({
-        allowsEditing: true,
-        aspect: [1, 1],
-        quality: 1,
-      });
-
-      if (!result.canceled) {
-        updateFamiliarImage(result.assets[0].uri);
-      }
-    } catch (err) {
-      Alert.alert("Error", "No se pudo tomar la foto.");
-    }
-  };
-
-  const handleGallery = async () => {
-    setModalVisible(false);
-    if (!ImagePicker || !ImagePicker.requestMediaLibraryPermissionsAsync) {
-      return;
-    }
-
-    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!permission.granted) {
-      Alert.alert(
-        "Permiso denegado",
-        "Se necesitan permisos de galería para seleccionar imágenes."
-      );
-      return;
-    }
-
-    try {
-      const result = await ImagePicker.launchImageLibraryAsync({
-        allowsEditing: true,
-        aspect: [1, 1],
-        quality: 1,
-      });
-
-      if (!result.canceled) {
-        updateFamiliarImage(result.assets[0].uri);
-      }
-    } catch (err) {
-      Alert.alert("Error", "No se pudo cargar la imagen.");
-    }
-  };
 
   return (
     <View style={styles.screen}>

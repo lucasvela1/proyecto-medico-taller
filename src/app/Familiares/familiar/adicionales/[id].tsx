@@ -1,4 +1,4 @@
-import { familiares, ItemClinico } from "@/data/familiares";
+import { familiares, ItemClinico, guardarFamiliaresEnAlmacenamiento } from "@/data/familiares";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
 import { useState } from "react";
@@ -85,6 +85,7 @@ export default function AdicionalesScreen() {
         notas: notas,
         dispositivosMedicos: dispositivos,
       };
+      guardarFamiliaresEnAlmacenamiento();
       Alert.alert(
         "Guardado",
         "Los datos adicionales fueron guardados correctamente.",

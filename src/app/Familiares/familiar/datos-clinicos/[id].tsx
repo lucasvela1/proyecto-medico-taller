@@ -1,4 +1,4 @@
-import { familiares, ItemClinico } from "@/data/familiares";
+import { familiares, ItemClinico, guardarFamiliaresEnAlmacenamiento } from "@/data/familiares";
 import { useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import {
@@ -137,6 +137,7 @@ export default function DatosClinicosScreen() {
         enfermedades: enfermedades,
         medicamentos: medicamentos,
       };
+      guardarFamiliaresEnAlmacenamiento();
       Alert.alert(
         "Guardado",
         "Los datos clinicos fueron guardados correctamente.",
