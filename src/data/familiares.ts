@@ -264,14 +264,14 @@ export function suscribirFamiliares(listener: () => void) {
 
 export function notificarCambioFamiliares() {
   listeners.forEach((listener) => listener());
-}
+} //Notificamos a todos los listeners que hubo cambios
 
-export async function cargarFamiliaresDeAlmacenamiento() {
-  if (!AsyncStorage) {
+export async function cargarFamiliaresDeAlmacenamiento() { //Lo mismo que guardar pero en vez de guardar, cargamos
+  if (!AsyncStorage) { //Verificamos si está disponible AsyncStorage
     console.warn("AsyncStorage no está disponible.");
     return;
   }
-  try {
+  try { //Usamos el AsyncStorage para guardar los datos y que persistan
     const jsonValue = await AsyncStorage.getItem(STORAGE_KEY);
     if (jsonValue != null) {
       const datosCargados = JSON.parse(jsonValue);
@@ -284,7 +284,7 @@ export async function cargarFamiliaresDeAlmacenamiento() {
   }
 }
 
-export async function guardarFamiliaresEnAlmacenamiento() {
+export async function guardarFamiliaresEnAlmacenamiento() { //Usamos el AsyncStorage para guardar los datos y que persistan
   if (!AsyncStorage) {
     console.warn("AsyncStorage no está disponible.");
     notificarCambioFamiliares();
@@ -292,9 +292,9 @@ export async function guardarFamiliaresEnAlmacenamiento() {
   }
   try {
     const jsonValue = JSON.stringify(familiares);
-    await AsyncStorage.setItem(STORAGE_KEY, jsonValue);
+    await AsyncStorage.setItem(STORAGE_KEY, jsonValue); //Serializamos los datos y los guardamos
     notificarCambioFamiliares();
-  } catch (e) {
+  } catch (e) { //Por si hay un error durante el guardado
     console.error("Error al guardar familiares en AsyncStorage:", e);
     notificarCambioFamiliares();
   }

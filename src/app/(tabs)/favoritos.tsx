@@ -14,7 +14,7 @@ import { FamiliarCard } from "../Familiares/familiares";
 
 function getFavoritos(): Familiar[] {
   return familiares.filter(
-    (f) => f.id !== "yo" && (f.esFavorito === true || f.esFavorito === "true")
+    (f) => f.id !== "yo" && (f.esFavorito === true || (f.esFavorito as any) === "true")
   );
 }
 
@@ -41,7 +41,7 @@ export default function FavoritosScreen() {
             item={item}
             onPress={() => router.push(fichaShowRoute(item.id))}
             onToggleFavorito={() => {
-              const actualmenteFav = item.esFavorito === true || item.esFavorito === "true";
+              const actualmenteFav = item.esFavorito === true || (item.esFavorito as any) === "true";
               item.esFavorito = !actualmenteFav;
               notificarCambioFamiliares(); // UI actualiza al instante
               guardarFamiliaresEnAlmacenamiento(); // Persiste en background

@@ -61,8 +61,8 @@ export default function FamiliaresScreen() {
   const filtro = texto.trim().toLowerCase();
   const familiaresFiltrados = filtro
     ? todosLosFamiliares.filter((f) =>
-        `${f.nombre} ${f.apellido}`.toLowerCase().includes(filtro)
-      )
+      `${f.nombre} ${f.apellido}`.toLowerCase().includes(filtro)
+    )
     : todosLosFamiliares;
 
   // Handler para iniciar importación
@@ -115,15 +115,15 @@ export default function FamiliaresScreen() {
   };
 
   const handleBarcodeScanned = ({ data }: { data: string }) => {
-    // Cerramos cámara inmediatamente
-    setIsCameraModalVisible(false);
+    //Cerramos cámara inmediatamente
+    setIsCameraModalVisible(false); //El modal de la camara se hace invisible o sea
     try {
       const datosImportados = JSON.parse(data);
       if (!datosImportados.nombre || !datosImportados.apellido) {
-        throw new Error("Formato inválido");
+        throw new Error("Formato inválido"); //Revisamops que tenga los datos obligatorios, habíamos puesto que eran el nombre y apellido al menos
       }
 
-      const relacion = vincSelect === "Otro" ? vincOtro.trim() : vincSelect;
+      const relacion = vincSelect === "Otro" ? vincOtro.trim() : vincSelect; //Si es otro el vinculo entonces lo trimeamos y ponemos
       const nuevoId = `fam-import-${Date.now()}`;
 
       const nuevoFamiliar: Familiar = {
@@ -134,21 +134,14 @@ export default function FamiliaresScreen() {
         identidad: datosImportados.identidad || {},
         datosClinicos: datosImportados.datosClinicos || {},
         adicionales: datosImportados.adicionales || {},
-      };
+      }; //Copiamos los datos del familiar, poniendo valores por defecto si no existen
 
       familiares.push(nuevoFamiliar);
       notificarCambioFamiliares();
       guardarFamiliaresEnAlmacenamiento();
 
-      setAlertModal({
-        visible: true,
-        tipo: "exito",
-        titulo: "Importación exitosa",
-        mensaje: `Se importó a ${nuevoFamiliar.nombre} ${nuevoFamiliar.apellido} correctamente.`,
-      });
-
-      // Redirigir a su detalle después del éxito
-      router.push(fichaShowRoute(nuevoId));
+      // Redirigir a su detalle después del éxito, indicando que fue importado
+      router.push(fichaShowRoute(nuevoId, { importado: "true" }));
     } catch {
       setAlertModal({
         visible: true,
@@ -206,7 +199,7 @@ export default function FamiliaresScreen() {
             item={item}
             onPress={() => router.push(fichaShowRoute(item.id))}
             onToggleFavorito={() => {
-              const actualmenteFav = item.esFavorito === true || item.esFavorito === "true";
+              const actualmenteFav = item.esFavorito === true || (item.esFavorito as any) === "true";
               item.esFavorito = !actualmenteFav;
               notificarCambioFamiliares();
               guardarFamiliaresEnAlmacenamiento();
@@ -294,25 +287,25 @@ export default function FamiliaresScreen() {
       <Modal
         visible={isCameraModalVisible}
         transparent={false}
-        animationType="slide"
+        animationType="slide" //Para que se deslice al aparecer
         onRequestClose={() => setIsCameraModalVisible(false)}
       >
         <View style={{ flex: 1, backgroundColor: "#000000" }}>
           <CameraView
             style={StyleSheet.absoluteFillObject}
             facing="back"
-            onBarcodeScanned={handleBarcodeScanned}
+            onBarcodeScanned={handleBarcodeScanned} //Le pasamos el handler para que lo llame cuando escanee un codigoqr
             barcodeScannerSettings={{
-              barcodeTypes: ["qr"],
+              barcodeTypes: ["qr"], //Usamos unicamente para qr porque nosotros SOLO generamos QR, pero se podría poner data matriz, código de barras, etc
             }}
           />
           {/* Overlay del Lector */}
           <View style={styles.scannerOverlay}>
             <View style={styles.scanTargetArea} />
             <Text style={styles.scannerText}>Apuntá la cámara al código QR de salud</Text>
-            
+
             <Pressable
-              onPress={() => setIsCameraModalVisible(false)}
+              onPress={() => setIsCameraModalVisible(false)} //Cuando se apreta el boton de cancelar, se cierra el modal
               style={({ pressed }) => [
                 styles.scannerCancelButton,
                 pressed && styles.confirmPressed,
@@ -390,9 +383,9 @@ export function FamiliarCard({
               style={styles.actionButton}
             >
               <Ionicons
-                name={(item.esFavorito === true || item.esFavorito === "true") ? "heart" : "heart-outline"}
+                name={(item.esFavorito === true || (item.esFavorito as any) === "true") ? "heart" : "heart-outline"}
                 size={24}
-                color={(item.esFavorito === true || item.esFavorito === "true") ? "#EB5757" : "#8AA9C9"}
+                color={(item.esFavorito === true || (item.esFavorito as any) === "true") ? "#EB5757" : "#8AA9C9"}
               />
             </Pressable>
           )}
@@ -418,7 +411,7 @@ export function FamiliarCard({
         onRequestClose={() => setConfirmVisible(false)}
       >
         <Pressable style={styles.confirmOverlay} onPress={() => setConfirmVisible(false)}>
-          <Pressable style={styles.confirmCard} onPress={() => {}}>
+          <Pressable style={styles.confirmCard} onPress={() => { }}>
             <View style={styles.confirmIconCircle}>
               <Ionicons name="trash" size={30} color="#E74C3C" />
             </View>

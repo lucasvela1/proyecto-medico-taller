@@ -27,8 +27,8 @@ export const buildRoute = (route: AppRoute, params?: RouteParams): Href => {
   } as Href; // El objeto Href que se construye con la ruta y los parámetros proporcionados.
 };
 
-export function fichaShowRoute(id: string) {
-  return buildRoute(ROUTES.FAMILIAR, { id }); // Construye la ruta para mostrar la ficha de un familiar específico, utilizando el ID como parámetro.
+export function fichaShowRoute(id: string, params?: RouteParams) {
+  return buildRoute(ROUTES.FAMILIAR, { id, ...params }); // Construye la ruta para mostrar la ficha de un familiar específico, utilizando el ID como parámetro y parámetros opcionales.
 }
 
 export function identidadRoute(id: string) {

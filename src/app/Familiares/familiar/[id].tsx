@@ -9,13 +9,13 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useIsFocused } from "@react-navigation/native";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Image, Linking, Modal, Pressable, Share, StyleSheet, Text, View } from "react-native";
 
 export default function FamiliarDetalleScreen() {
   const router = useRouter();
   const isFocused = useIsFocused();
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, importado } = useLocalSearchParams<{ id: string; importado?: string }>();
   const familiar = familiares.find((item) => item.id === id);
 
   const {
@@ -30,11 +30,18 @@ export default function FamiliarDetalleScreen() {
 
   const [isAlertModalVisible, setIsAlertModalVisible] = useState(false);
   const [isQrModalVisible, setIsQrModalVisible] = useState(false);
+  const [isSuccessModalVisible, setIsSuccessModalVisible] = useState(importado === "true");
   const [errorModal, setErrorModal] = useState<{ visible: boolean; titulo: string; mensaje: string }>({
     visible: false,
     titulo: "",
     mensaje: "",
   });
+
+  useEffect(() => {
+    if (importado === "true") {
+      setIsSuccessModalVisible(true);
+    }
+  }, [importado]);
 
   if (!familiar) {
     return (
@@ -317,6 +324,17 @@ export default function FamiliarDetalleScreen() {
         titulo={errorModal.titulo}
         mensaje={errorModal.mensaje}
         onClose={() => setErrorModal((prev) => ({ ...prev, visible: false }))}
+      />
+
+      <AppModalAlert
+        visible={isSuccessModalVisible}
+        tipo="exito"
+        titulo="Importación exitosa"
+        mensaje={`Se importó a ${familiar.nombre} ${familiar.apellido} correctamente.`}
+        onClose={() => {
+          setIsSuccessModalVisible(false);
+          router.setParams({ importado: undefined });
+        }}
       />
 
       {/* Modal del Código QR de exportación */}

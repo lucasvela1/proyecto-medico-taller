@@ -1,5 +1,5 @@
-import {Ionicons} from "@expo/vector-icons";
-import {Tabs} from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { Tabs } from "expo-router";
 
 //Este layout se encarga de renderizar las pestañas 
 //de navegación en la parte inferior de la aplicación. 
@@ -11,7 +11,7 @@ import {Tabs} from "expo-router";
 //se oculta el encabezado para cada pantalla dentro de las pestañas
 
 export default function RootLayout() {
-  return  (
+  return (
     <Tabs
       screenOptions={{
         headerShown: false,
@@ -30,7 +30,7 @@ export default function RootLayout() {
           tabBarLabel: "Inicio",
           headerTitle: "Inicio",
           title: "Inicio",
-          tabBarIcon: ({color, size, focused}) => (
+          tabBarIcon: ({ color, size, focused }) => (
             <Ionicons
               name={focused ? "home" : "home-outline"}
               size={size}
@@ -44,7 +44,7 @@ export default function RootLayout() {
         options={{
           title: "Favoritos",
           tabBarLabel: "Favoritos",
-          tabBarIcon: ({color, size, focused}) => (
+          tabBarIcon: ({ color, size, focused }) => (
             <Ionicons
               name={focused ? "heart" : "heart-outline"}
               size={size}
@@ -52,7 +52,7 @@ export default function RootLayout() {
             />
           )
         }}
-        />
+      />
     </Tabs>
   )
 }

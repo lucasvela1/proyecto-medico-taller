@@ -46,7 +46,7 @@ export default function YoScreen() {
     );
   }
 
-  // Empty state: primera vez que se abre la app sin datos cargados
+  //Empty state: primera vez que se abre la app sin datos cargados. Tenemos que meterle cosas
   const sinDatos = !familiar.nombre.trim() && !familiar.apellido.trim();
   if (sinDatos) {
     return (
@@ -220,7 +220,7 @@ export default function YoScreen() {
         onRequestClose={() => setIsAlertModalVisible(false)}
       >
         <Pressable style={styles.modalOverlay} onPress={() => setIsAlertModalVisible(false)}>
-          <Pressable style={styles.alertModalContainer} onPress={() => {}}>
+          <Pressable style={styles.alertModalContainer} onPress={() => { }}>
             <View style={styles.alertIconCircle}>
               <Ionicons name="warning" size={32} color="#FF8A80" />
             </View>
@@ -242,13 +242,13 @@ export default function YoScreen() {
                 if (familiar.identidad?.fechaNacimiento) msg += `• *Fecha de nacimiento:* ${familiar.identidad.fechaNacimiento}\n`;
                 if (familiar.datosClinicos?.grupoSanguineo) msg += `• *Grupo sanguíneo:* ${familiar.datosClinicos.grupoSanguineo}\n`;
                 if (familiar.datosClinicos?.coberturaMedica) msg += `• *Cobertura médica:* ${familiar.datosClinicos.coberturaMedica} (Nro: ${familiar.datosClinicos.numeroAfiliado || "No especificado"})\n`;
-                
+
                 const alergias = familiar.datosClinicos?.alergias ?? [];
                 if (alergias.length > 0) msg += `• *Alergias:* ${alergias.map(a => a.nombre).join(", ")}\n`;
-                
+
                 const enf = familiar.datosClinicos?.enfermedades ?? [];
                 if (enf.length > 0) msg += `• *Enfermedades:* ${enf.map(e => e.nombre).join(", ")}\n`;
-                
+
                 const med = familiar.datosClinicos?.medicamentos ?? [];
                 if (med.length > 0) msg += `• *Medicamentos:* ${med.map(m => m.nombre).join(", ")}\n`;
 
@@ -266,7 +266,7 @@ export default function YoScreen() {
 
                 Share.share({
                   message: msg,
-                }).catch(() => {});
+                }).catch(() => { });
               }}
             >
               <Ionicons name="share-social-outline" size={20} color="#FFFFFF" />
@@ -292,13 +292,13 @@ export default function YoScreen() {
                     if (familiar.identidad?.fechaNacimiento) msg += `• *Fecha de nacimiento:* ${familiar.identidad.fechaNacimiento}\n`;
                     if (familiar.datosClinicos?.grupoSanguineo) msg += `• *Grupo sanguíneo:* ${familiar.datosClinicos.grupoSanguineo}\n`;
                     if (familiar.datosClinicos?.coberturaMedica) msg += `• *Cobertura médica:* ${familiar.datosClinicos.coberturaMedica} (Nro: ${familiar.datosClinicos.numeroAfiliado || "No especificado"})\n`;
-                    
+
                     const alergias = familiar.datosClinicos?.alergias ?? [];
                     if (alergias.length > 0) msg += `• *Alergias:* ${alergias.map(a => a.nombre).join(", ")}\n`;
-                    
+
                     const enf = familiar.datosClinicos?.enfermedades ?? [];
                     if (enf.length > 0) msg += `• *Enfermedades:* ${enf.map(e => e.nombre).join(", ")}\n`;
-                    
+
                     const med = familiar.datosClinicos?.medicamentos ?? [];
                     if (med.length > 0) msg += `• *Medicamentos:* ${med.map(m => m.nombre).join(", ")}\n`;
 
@@ -361,7 +361,7 @@ export default function YoScreen() {
         onRequestClose={() => setIsQrModalVisible(false)}
       >
         <Pressable style={styles.modalOverlay} onPress={() => setIsQrModalVisible(false)}>
-          <Pressable style={styles.qrModalContainer} onPress={() => {}}>
+          <Pressable style={styles.qrModalContainer} onPress={() => { }}>
             <View style={styles.qrIconCircle}>
               <Ionicons name="qr-code" size={32} color="#4ADE80" />
             </View>
