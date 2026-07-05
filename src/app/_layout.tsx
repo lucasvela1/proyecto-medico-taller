@@ -1,9 +1,9 @@
-import { Stack } from "expo-router";
 import { useInitializeFamiliares } from "@/hooks/use-initialize-familiares";
+import { Stack } from "expo-router";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 
 export default function RootLayout() {
-  const cargando = useInitializeFamiliares();
+  const cargando = useInitializeFamiliares(); //Le decimos a la app que espere a que se carguen los datos antes de mostrar el menu
 
   if (cargando) {
     return (
@@ -14,8 +14,8 @@ export default function RootLayout() {
   }
 
   return (
-    <Stack screenOptions = {{headerBackButtonDisplayMode: "minimal"}} >
-      <Stack.Screen name ="(tabs)" options= {{headerShown: false}} />
+    <Stack screenOptions={{ headerBackButtonDisplayMode: "minimal" }} >
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
     </Stack>
   );
 }

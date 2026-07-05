@@ -32,8 +32,8 @@ async function buscarLugaresCercanos(lat: number, lon: number): Promise<Lugar[]>
   };
 
   const bodyClinicas = {
-    includedTypes: ["hospital", "medical_clinic", "medical_center"],
-    maxResultCount: 20,
+    includedTypes: ["hospital", "medical_clinic", "medical_center"], //Filtra los tipos
+    maxResultCount: 20, //De a 20 resultados
     locationRestriction: {
       circle: {
         center: { latitude: lat, longitude: lon },
@@ -43,8 +43,8 @@ async function buscarLugaresCercanos(lat: number, lon: number): Promise<Lugar[]>
   };
 
   const bodyFarmacias = {
-    includedTypes: ["pharmacy", "drugstore"],
-    maxResultCount: 20,
+    includedTypes: ["pharmacy", "drugstore"], //Filtra los tipos farmacias
+    maxResultCount: 20, //Máximo 20
     locationRestriction: {
       circle: {
         center: { latitude: lat, longitude: lon },
@@ -60,7 +60,7 @@ async function buscarLugaresCercanos(lat: number, lon: number): Promise<Lugar[]>
       body: JSON.stringify(bodyClinicas),
     }),
     fetch(url, {
-      method: "POST",
+      method: "POST", //hacemos post porque mandamos un body 
       headers,
       body: JSON.stringify(bodyFarmacias),
     }),
@@ -106,6 +106,10 @@ type ServicioEmergencia = {
   bgLight: string;
 };
 
+//Los servicios de emergencia los decoramos con colores representativos
+//Se presiona el cuadrado (cualquier área de este) y te lleva al tel para llamar, no llama automatico
+//Se pensó así para evitar missclicks y tener una capa de confirmación del usuario
+
 const SERVICIOS_EMERGENCIA: ServicioEmergencia[] = [
   {
     id: "medicas",
@@ -148,7 +152,7 @@ const SERVICIOS_EMERGENCIA: ServicioEmergencia[] = [
 const llamarServicio = (numero: string) => {
   Linking.openURL(`tel:${numero}`).catch((err) =>
     console.warn("No se pudo iniciar la llamada telefónica:", err)
-  );
+  ); //Lo hacemos con catch porque a veces falla la app de llamadas (no ha pasado en las pruebas, pero por las dudas)
 };
 
 export default function ServiciosScreen() {
@@ -182,7 +186,9 @@ export default function ServiciosScreen() {
           setLugares(lugaresReales);
         } catch (apiError: any) {
           // Si falla (por ejemplo, por CORS en la web, falta de facturación o clave restringida),
-          // mostramos un aviso y usamos datos simulados para no interrumpir la experiencia.
+          // mostramos un aviso y usamos datos simulados para no interrumpir la experiencia de prueba.
+
+          //Obviamente en un despliegue real quitamos la simulación, solo mostramos el fallo
           console.warn("Fallo al consultar Google Places API:", apiError.message);
           setInfoMsg(
             "Nota: Mostrando datos simulados debido a restricciones de Google Places API (ej. facturación no activa o CORS en entorno web)."
@@ -276,7 +282,7 @@ export default function ServiciosScreen() {
           ))}
         </View>
 
-        {/* Sección de Clínicas y Farmacias */}
+        {/* Sección de clínicas y farmacias */}
         <View style={styles.header}>
           <Text style={styles.title}>Clínicas y Farmacias</Text>
           <Text style={styles.subtitle}>
@@ -289,7 +295,7 @@ export default function ServiciosScreen() {
           )}
         </View>
 
-        {/* Leyenda del Mapa */}
+        {/* Leyenda del Mapa con los colores de los pines, amarillo para farmacias y rojo para hospitales*/}
         <View style={styles.legendContainer}>
           <View style={styles.legendItem}>
             <Ionicons name="location-sharp" size={18} color="#FF3B30" />
