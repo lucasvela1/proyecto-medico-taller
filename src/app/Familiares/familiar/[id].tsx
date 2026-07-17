@@ -454,7 +454,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   alertButton: {
-    marginTop: 62,
+    marginTop: 30,
     minHeight: 72,
     borderRadius: 14,
     backgroundColor: "#B42318",

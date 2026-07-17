@@ -76,7 +76,7 @@ export default function YoScreen() {
   }
 
   return (
-    <ScrollView style={styles.screen}>
+    <View style={styles.screen}>
       <View style={styles.headerRow}>
         <Pressable
           onPress={() => setModalVisible(true)}
@@ -399,7 +399,7 @@ export default function YoScreen() {
           </Pressable>
         </Pressable>
       </Modal>
-    </ScrollView>
+    </View>
   );
 }
 
@@ -471,7 +471,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   alertButton: {
-    marginTop: 62,
+    marginTop: 30,
     minHeight: 72,
     borderRadius: 14,
     backgroundColor: "#B42318",

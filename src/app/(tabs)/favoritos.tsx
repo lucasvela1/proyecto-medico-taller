@@ -64,10 +64,6 @@ export default function FavoritosScreen() {
             <View style={styles.userBadge}>
               <Ionicons name="person-circle" size={16} color="#5BA3E0" />
               <Text style={styles.userEmail}>{user.email}</Text>
-              <View style={styles.syncBadge}>
-                <Ionicons name="sync" size={12} color="#4ADE80" />
-                <Text style={styles.syncText}>Tiempo real</Text>
-              </View>
             </View>
           </View>
         }
@@ -123,20 +119,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: "#8AA9C9",
     flex: 1,
-  },
-  syncBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-    backgroundColor: "rgba(74, 222, 128, 0.12)",
-    borderRadius: 20,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-  },
-  syncText: {
-    fontSize: 11,
-    color: "#4ADE80",
-    fontWeight: "700",
   },
   separator: {
     height: 10,

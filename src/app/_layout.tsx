@@ -17,7 +17,69 @@ function AppContent() {
   return (
     <Stack screenOptions={{ headerBackButtonDisplayMode: "minimal" }} >
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      <Stack.Screen name="yo" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="yo"
+        options={{
+          headerShown: true,
+          headerTitle: "Mi Perfil",
+          headerStyle: { backgroundColor: "#0B1F3A" },
+          headerTintColor: "#EAF4FF",
+        }}
+      />
+      <Stack.Screen
+        name="Familiares/familiares"
+        options={{
+          headerShown: true,
+          headerTitle: "Familiares",
+          headerStyle: { backgroundColor: "#0B1F3A" },
+          headerTintColor: "#EAF4FF",
+        }}
+      />
+      <Stack.Screen
+        name="Familiares/crear"
+        options={{
+          headerShown: true,
+          headerTitle: "Agregar Familiar",
+          headerStyle: { backgroundColor: "#0B1F3A" },
+          headerTintColor: "#EAF4FF",
+        }}
+      />
+      <Stack.Screen
+        name="Familiares/familiar/[id]"
+        options={{
+          headerShown: true,
+          headerTitle: "Detalle de Familiar",
+          headerStyle: { backgroundColor: "#0B1F3A" },
+          headerTintColor: "#EAF4FF",
+        }}
+      />
+      <Stack.Screen
+        name="Familiares/familiar/identidad/[id]"
+        options={{
+          headerShown: true,
+          headerTitle: "Identidad y Contacto",
+          headerStyle: { backgroundColor: "#0B1F3A" },
+          headerTintColor: "#EAF4FF",
+        }}
+      />
+      <Stack.Screen
+        name="Familiares/familiar/datos-clinicos/[id]"
+        options={{
+          headerShown: true,
+          headerTitle: "Datos Clínicos",
+          headerStyle: { backgroundColor: "#0B1F3A" },
+          headerTintColor: "#EAF4FF",
+        }}
+      />
+      <Stack.Screen
+        name="Familiares/familiar/adicionales/[id]"
+        options={{
+          headerShown: true,
+          headerTitle: "Datos Adicionales",
+          headerStyle: { backgroundColor: "#0B1F3A" },
+          headerTintColor: "#EAF4FF",
+        }}
+      />
       <Stack.Screen
         name="auth/login"
         options={{
