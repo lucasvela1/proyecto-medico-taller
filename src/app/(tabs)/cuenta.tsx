@@ -81,10 +81,6 @@ export default function CuentaScreen() {
           <Text style={styles.cardLabel}>Sesión iniciada como</Text>
           <Text style={styles.cardValue} numberOfLines={1}>{user.email}</Text>
 
-          <View style={styles.syncBadge}>
-            <Ionicons name="sync" size={14} color="#4ADE80" />
-            <Text style={styles.syncText}>Sincronización activa (Tiempo real)</Text>
-          </View>
         </View>
 
         <Pressable
@@ -220,11 +216,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     marginTop: 8,
-  },
-  syncText: {
-    fontSize: 12,
-    color: "#4ADE80",
-    fontWeight: "700",
   },
   logoutButton: {
     flexDirection: "row",
