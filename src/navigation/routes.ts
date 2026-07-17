@@ -11,6 +11,8 @@ export const ROUTES = {
   FAMILIARES: "/Familiares/familiares", //ruta para mostrar la lista de familiares.
   YO: "/yo",
   SERVICIOS: "/servicios",
+  AUTH_LOGIN: "/auth/login",
+  AUTH_REGISTER: "/auth/register",
 } as const;
 
 export type AppRoute = (typeof ROUTES)[keyof typeof ROUTES]; //Aqui se define el tipo AppRoute como una unión de los valores de las rutas definidas en el objeto ROUTES. Esto permite que cualquier variable del tipo AppRoute solo pueda contener uno de los valores definidos en ROUTES, lo que ayuda a garantizar la seguridad de tipos en la navegación de la aplicación.

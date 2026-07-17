@@ -1,4 +1,6 @@
+import { useAuth } from "@/contexts/auth-context";
 import { familiares, ItemClinico, guardarFamiliaresEnAlmacenamiento } from "@/data/familiares";
+import { guardarFamiliarFirestore } from "@/services/firestore-familiares";
 import { AppModalAlert } from "@/components/AppModalAlert";
 import { useLocalSearchParams } from "expo-router";
 import { useState } from "react";
@@ -17,6 +19,7 @@ type ListaClinica = "alergias" | "enfermedades" | "medicamentos";
 
 export default function DatosClinicosScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { user } = useAuth();
   const familiar = familiares.find((item) => item.id === id);
 
   const [grupoSanguineo, setGrupoSanguineo] = useState(
@@ -144,6 +147,9 @@ export default function DatosClinicosScreen() {
         medicamentos: medicamentos,
       };
       guardarFamiliaresEnAlmacenamiento();
+      if (user) {
+        guardarFamiliarFirestore(user.uid, familiar).catch(console.error);
+      }
       setAlertModal({ visible: true, tipo: "exito", titulo: "Guardado", mensaje: "Los datos clínicos fueron guardados correctamente." });
     }
   };

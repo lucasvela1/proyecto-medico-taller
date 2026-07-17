@@ -251,6 +251,16 @@ export const familiares: Familiar[] = [
   },
 ];
 
+// Cache en memoria para las imágenes locales
+export const imagenesCache = new Map<string, any>();
+
+// Inicializamos la caché con las imágenes predefinidas de familiares
+familiares.forEach((f) => {
+  if (f.imagenUrl) {
+    imagenesCache.set(f.id, f.imagenUrl);
+  }
+});
+
 const STORAGE_KEY = "@familiares_data_v1";
 
 const listeners = new Set<() => void>();
@@ -277,6 +287,14 @@ export async function cargarFamiliaresDeAlmacenamiento() { //Lo mismo que guarda
       const datosCargados = JSON.parse(jsonValue);
       familiares.length = 0;
       familiares.push(...datosCargados);
+      
+      // Poblamos la caché con las imágenes guardadas en el almacenamiento local
+      datosCargados.forEach((f: any) => {
+        if (f.imagenUrl) {
+          imagenesCache.set(f.id, f.imagenUrl);
+        }
+      });
+      
       notificarCambioFamiliares();
     }
   } catch (e) {
@@ -291,6 +309,13 @@ export async function guardarFamiliaresEnAlmacenamiento() { //Usamos el AsyncSto
     return;
   }
   try {
+    // Sincronizamos las imágenes actuales de la lista en memoria con la caché antes de guardar
+    familiares.forEach((f) => {
+      if (f.imagenUrl) {
+        imagenesCache.set(f.id, f.imagenUrl);
+      }
+    });
+
     const jsonValue = JSON.stringify(familiares);
     await AsyncStorage.setItem(STORAGE_KEY, jsonValue); //Serializamos los datos y los guardamos
     notificarCambioFamiliares();
