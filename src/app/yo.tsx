@@ -11,7 +11,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useIsFocused } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Image, Linking, Modal, Pressable, Share, StyleSheet, Text, View } from "react-native";
+import { Image, Linking, Modal, Pressable, ScrollView, Share, StyleSheet, Text, View } from "react-native";
 
 export default function YoScreen() {
   const router = useRouter();
@@ -285,7 +285,7 @@ export default function YoScreen() {
                   ]}
                   onPress={() => {
                     setIsAlertModalVisible(false);
-                    // Formatear mensaje
+                    //Formatear mensaje
                     const cNombre = familiar.nombre ? `${familiar.nombre} ${familiar.apellido}`.trim() : "Usuario";
                     let msg = `🚨 *MENSAJE DE EMERGENCIA* 🚨\n\nHola, necesito ayuda urgente.\n\n*Datos médicos de ${cNombre}:*\n`;
                     if (familiar.identidad?.dni) msg += `• *DNI:* ${familiar.identidad.dni}\n`;
@@ -314,11 +314,11 @@ export default function YoScreen() {
                     const notas = familiar.adicionales?.notas;
                     if (notas) msg += `• *Notas adicionales:* ${notas}\n`;
 
-                    // Limpiar número de caracteres no numéricos
+                    //Limpiar número de caracteres no numéricos
                     const cleanPhone = c.numeroTel.replace(/[^\d+]/g, "");
                     const url = `whatsapp://send?text=${encodeURIComponent(msg)}&phone=${cleanPhone}`;
                     Linking.openURL(url).catch(() => {
-                      // Fallback a web wa.me
+                      //Fallback a web wa.me
                       Linking.openURL(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`);
                     });
                   }}
@@ -409,6 +409,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#0B1F3A",
     padding: 16,
     paddingTop: 28,
+    paddingBottom: 32,
   },
   headerRow: {
     flexDirection: "row",
@@ -470,7 +471,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   alertButton: {
-    marginTop: 62,
+    marginTop: 30,
     minHeight: 72,
     borderRadius: 14,
     backgroundColor: "#B42318",

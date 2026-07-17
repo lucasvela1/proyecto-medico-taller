@@ -53,6 +53,21 @@ export default function RootLayout() {
           )
         }}
       />
+
+      <Tabs.Screen
+        name="cuenta"
+        options={{
+          title: "Mi Cuenta",
+          tabBarLabel: "Mi Cuenta",
+          tabBarIcon: ({ color, size, focused }) => (
+            <Ionicons
+              name={focused ? "person-circle" : "person-circle-outline"}
+              size={size}
+              color={color}
+            />
+          )
+        }}
+      />
     </Tabs>
   )
 }

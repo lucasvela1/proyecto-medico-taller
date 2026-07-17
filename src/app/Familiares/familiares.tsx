@@ -1,5 +1,6 @@
 import { AppModalAlert } from "@/components/AppModalAlert";
-import { Familiar, familiares, guardarFamiliaresEnAlmacenamiento, notificarCambioFamiliares, suscribirFamiliares } from "@/data/familiares";
+import { Familiar } from "@/data/familiares";
+import { useFamiliares } from "@/hooks/use-familiares";
 import { crearFamiliarRoute, fichaShowRoute } from "@/navigation/routes";
 import { Ionicons } from "@expo/vector-icons";
 import { CameraView, useCameraPermissions } from "expo-camera";
@@ -29,14 +30,10 @@ const VINCULOS = [
 
 type Vinculo = (typeof VINCULOS)[number];
 
-function getFamiliaresSinYo(): Familiar[] {
-  return familiares.filter((f) => f.id !== "yo");
-}
-
 export default function FamiliaresScreen() {
   const router = useRouter();
+  const { getFamiliaresSinYo, toggleFavorito, agregarFamiliar, eliminarFamiliar } = useFamiliares();
   const [texto, setTexto] = useState("");
-  const [todosLosFamiliares, setTodosLosFamiliares] = useState<Familiar[]>(getFamiliaresSinYo);
 
   // Estados para Importación QR
   const [permission, requestPermission] = useCameraPermissions();
@@ -51,13 +48,7 @@ export default function FamiliaresScreen() {
     mensaje: string;
   }>({ visible: false, tipo: "exito", titulo: "", mensaje: "" });
 
-  useEffect(() => {
-    const desuscribir = suscribirFamiliares(() => {
-      setTodosLosFamiliares(getFamiliaresSinYo());
-    });
-    return desuscribir;
-  }, []);
-
+  const todosLosFamiliares = getFamiliaresSinYo();
   const filtro = texto.trim().toLowerCase();
   const familiaresFiltrados = filtro
     ? todosLosFamiliares.filter((f) =>
@@ -136,9 +127,7 @@ export default function FamiliaresScreen() {
         adicionales: datosImportados.adicionales || {},
       }; //Copiamos los datos del familiar, poniendo valores por defecto si no existen
 
-      familiares.push(nuevoFamiliar);
-      notificarCambioFamiliares();
-      guardarFamiliaresEnAlmacenamiento();
+      agregarFamiliar(nuevoFamiliar);
 
       // Redirigir a su detalle después del éxito, indicando que fue importado
       router.push(fichaShowRoute(nuevoId, { importado: "true" }));
@@ -198,18 +187,8 @@ export default function FamiliaresScreen() {
           <FamiliarCard
             item={item}
             onPress={() => router.push(fichaShowRoute(item.id))}
-            onToggleFavorito={() => {
-              const actualmenteFav = item.esFavorito === true || (item.esFavorito as any) === "true";
-              item.esFavorito = !actualmenteFav;
-              notificarCambioFamiliares();
-              guardarFamiliaresEnAlmacenamiento();
-            }}
-            onEliminar={() => {
-              const idx = familiares.findIndex((f) => f.id === item.id);
-              if (idx !== -1) familiares.splice(idx, 1);
-              notificarCambioFamiliares();
-              guardarFamiliaresEnAlmacenamiento();
-            }}
+            onToggleFavorito={() => toggleFavorito(item.id)}
+            onEliminar={() => eliminarFamiliar(item.id)}
           />
         )}
         ItemSeparatorComponent={() => <View style={styles.separator} />}

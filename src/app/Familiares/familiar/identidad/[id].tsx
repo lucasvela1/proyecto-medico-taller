@@ -1,4 +1,6 @@
+import { useAuth } from "@/contexts/auth-context";
 import { ContactoEmergencia, familiares, guardarFamiliaresEnAlmacenamiento } from "@/data/familiares";
+import { guardarFamiliarFirestore } from "@/services/firestore-familiares";
 import { AppModalAlert } from "@/components/AppModalAlert";
 import { useLocalSearchParams } from "expo-router";
 import { useState } from "react";
@@ -15,6 +17,7 @@ import {
 
 export default function IdentidadScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { user } = useAuth();
   const familiar = familiares.find((item) => item.id === id);
 
   const [nombre, setNombre] = useState(familiar?.nombre ?? "");
@@ -66,6 +69,9 @@ export default function IdentidadScreen() {
         contactosEmergencia: contactos,
       };
       guardarFamiliaresEnAlmacenamiento();
+      if (user) {
+        guardarFamiliarFirestore(user.uid, familiar).catch(console.error);
+      }
       setAlertModal({ visible: true, tipo: "exito", titulo: "Guardado", mensaje: "Los datos fueron guardados correctamente." });
 
     }

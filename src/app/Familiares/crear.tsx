@@ -1,10 +1,8 @@
 import { AppModalAlert } from "@/components/AppModalAlert";
 import {
   ContactoEmergencia,
-  familiares,
-  guardarFamiliaresEnAlmacenamiento,
-  notificarCambioFamiliares,
 } from "@/data/familiares";
+import { useFamiliares } from "@/hooks/use-familiares";
 import { fichaShowRoute } from "@/navigation/routes";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -34,6 +32,7 @@ type Vinculo = (typeof VINCULOS)[number];
 
 export default function CrearFamiliarScreen() {
   const router = useRouter();
+  const { agregarFamiliar } = useFamiliares();
 
   // Datos de identidad
   const [nombre, setNombre] = useState("");
@@ -142,7 +141,7 @@ export default function CrearFamiliarScreen() {
     const relacion = vincSelect === "Otro" ? vincOtro.trim() : vincSelect;
     const nuevoId = `fam-${Date.now()}`;
 
-    familiares.push({
+    const nuevoFamiliar = {
       id: nuevoId,
       nombre: nombre.trim(),
       apellido: apellido.trim(),
@@ -152,10 +151,9 @@ export default function CrearFamiliarScreen() {
         fechaNacimiento: fechaNacimiento.trim(),
         contactosEmergencia: contactos,
       },
-    });
+    };
 
-    notificarCambioFamiliares();
-    guardarFamiliaresEnAlmacenamiento();
+    agregarFamiliar(nuevoFamiliar);
 
     // Navegar al detalle del familiar recién creado (reemplazando esta pantalla)
     router.replace(fichaShowRoute(nuevoId));
